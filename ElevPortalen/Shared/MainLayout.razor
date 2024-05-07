@@ -1,0 +1,56 @@
+﻿@using ElevPortalen.Pages
+@inherits LayoutComponentBase
+
+<PageTitle>ElevPortalen</PageTitle>
+
+<div class="page">
+    <div class="sidebar bg-dark" style="@IconMenuCssClass">
+        <NavMenu ShowIconMenu="ToggleIconMenu" />
+    </div>
+
+    <main>
+        <article>
+            <CustomErrorBoundary @ref="@errorBoundary" Context="Exception">
+                <ChildContent>
+                    @Body
+                </ChildContent>
+
+                <ErrorContent>
+                    <div class="alert bg-danger text-white alert-dismissible m-2">
+                        <p>
+                            Type: @Exception.GetType()
+                        </p>
+                        <p>
+                            Message: @Exception.Message
+                        </p>
+                        <p>
+                            Method: @Exception.TargetSite
+                        </p>
+                        <p>
+                            Help link: @Exception.HelpLink
+                        </p>
+                        @*                         Type: @Exception.GetType() | Message: @Exception.Message | Method: @Exception.TargetSite | Help link: @Exception.HelpLink *@
+
+                        <button class="btn-close" data-bs-dismiss="alert" onclick="@errorBoundary.Recover"></button>
+                    </div>
+                </ErrorContent>
+            </CustomErrorBoundary>
+        </article>
+    </main>
+</div>
+
+@code {
+    private ErrorBoundary? errorBoundary;
+    private bool _iconMenuActive { get; set; }
+    private string? IconMenuCssClass => _iconMenuActive ? "width: 80px;" : null;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    protected void ToggleIconMenu(bool iconMenuActive)
+    {
+        _iconMenuActive = iconMenuActive;
+    }
+}
