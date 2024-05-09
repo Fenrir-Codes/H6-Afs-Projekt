@@ -1,41 +1,56 @@
-using ElevPortalen;
 using ElevPortalen.Areas.Identity;
 using ElevPortalen.Areas.Identity.Pages.Account;
 using ElevPortalen.Data;
+using ElevPortalen.DatabaseErrorHandler;
+using ElevPortalen.Pages.AlertBox;
 using ElevPortalen.Services;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Code Modificated by Jozsef
+
 // Add services to the container.
+//LoginDb
+var LoginDatabase = builder.Configuration.GetConnectionString("LoginDatabase") ??
+    throw new InvalidOperationException("Connection string 'LoginDatabase' not found.");
+//The ElevPortalenDb.
+var PortalDatabase = builder.Configuration.GetConnectionString("PortalDatabase") ??
+    throw new InvalidOperationException("Connection string 'PortalDatabase' not found.");
+//RecoveryDb
+var DataRecoveryString = builder.Configuration.GetConnectionString("RecoveryDatabase") ??
+    throw new InvalidOperationException("Connection string 'RecoveryDatabase' not found.");
+//Job offer database
+var JobOfferDataBase = builder.Configuration.GetConnectionString("JobOfferDataBase") ??
+    throw new InvalidOperationException("Connection string 'LoginDatabase' not found.");
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-//The ElevPortalen-Data db string.
-var dbString = builder.Configuration.GetConnectionString("DbConnection") ?? 
-    throw new InvalidOperationException("Connection string 'DbConnection' not found.");
-
-var DataRecoveryDbString = builder.Configuration.GetConnectionString("RecoveryDbConnection") ??
-    throw new InvalidOperationException("Connection string 'DbConnection' not found.");
-
-builder.Services.AddDbContext<ElevPortalenDataDbContext>(options => options.UseSqlServer(dbString));
-builder.Services.AddDbContext<DataRecoveryDbContext>(options => options.UseSqlServer(DataRecoveryDbString));
+//DbContexts
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(LoginDatabase));
+builder.Services.AddDbContext<ElevPortalenDataDbContext>(options => options.UseSqlServer(PortalDatabase));
+builder.Services.AddDbContext<DataRecoveryDbContext>(options => options.UseSqlServer(DataRecoveryString));
+builder.Services.AddDbContext<JobOfferDbContext>(options => options.UseSqlServer(JobOfferDataBase));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 //Added IdentityRole by Jozsef
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+options.SignIn.RequireConfirmedAccount = false)
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Password settings to min 6 char and require Uppercase, unique char, and digit.
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+});
+//Identity END
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -45,19 +60,17 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 builder.Services.AddScoped<CompanyService>();
 builder.Services.AddScoped<ElevPortalenDataDbContext>();
 builder.Services.AddScoped<StudentService>();
+builder.Services.AddScoped<JobService>();
 builder.Services.AddScoped<DawaService>();
-builder.Services.AddScoped<RegisterModel>();
 builder.Services.AddScoped<SkillService>();
+builder.Services.AddScoped<AlertBox>();
+builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<RegisterModel>();
+builder.Services.AddScoped<ImageUploadService>();
 builder.Services.AddHttpClient();
-//End ----
-
-//added Database context by Jozsef
-builder.Services.AddDbContext<ElevPortalenDataDbContext>(options =>
-    options.UseSqlServer(connectionString));
-// End ----
-
 //Dataprotection service by Jozsef
 builder.Services.AddDataProtection();
+
 // End ----
 
 var app = builder.Build();
@@ -101,6 +114,9 @@ else
     app.UseHsts();
 }
 
+// Added database connection error handler
+app.UseMiddleware<DatabaseErrorHandler>();
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -117,3 +133,4 @@ app.MapFallbackToPage("/_Host");
 await CheckRolesExisting(app);
 
 app.Run();
+

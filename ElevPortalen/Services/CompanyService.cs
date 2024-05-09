@@ -2,14 +2,14 @@
 using ElevPortalen.Models;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Sockets;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+
 
 namespace ElevPortalen.Services
 {
-    //Lavet af Jozsef
+    /// <summary>
+    ///  Lavet af Jozsef
+    /// </summary>
     public class CompanyService
     {
         private readonly ElevPortalenDataDbContext _context;
@@ -21,30 +21,30 @@ namespace ElevPortalen.Services
         {
             _context = context;
             _recoveryContext = recoveryContext;
-            _dataProtector = dataProtectionProvider.CreateProtector("ProtectData"); 
+            _dataProtector = dataProtectionProvider.CreateProtector("ProtectData");
             //i just placed it here if need, we can use it to protect data
         }
         #endregion
 
         #region create Company function async
-        public async Task<string> CreateCompany(CompanyModel company)
+        public async Task<(string?, bool)> CreateCompany(CompanyModel company)
         {
             try
             {
                 _context.Company.Add(company); // Add input to context variables
                 await _context.SaveChangesAsync(); // Save data
 
-                return $"Company Profile Created";
+                return ("Company Profile Created.", true);
             }
             catch (Exception ex)
             {
                 // Handle the exception and return an error message
-                throw new InvalidOperationException($"An error har ocurred: {ex.Message}");
+                return ($"An error has ocurred: {ex.Message}", false);
             }
         }
         #endregion
 
-        #region Get Company request
+        #region Get Company request with the claimprincipal
         public async Task<List<CompanyModel>> ReadData(ClaimsPrincipal _user)
         {
             try
@@ -62,7 +62,24 @@ namespace ElevPortalen.Services
         }
         #endregion
 
-        #region Get All Data from Company
+        #region Get All Data from Company if they are visible
+        public async Task<List<CompanyModel>> ReadAllVisibleCompanyData()
+        {
+            try
+            {
+                //Get all the data
+                var response = await _context.Company.Where(c => c.IsVisible == true).AsNoTracking().ToListAsync();
+
+                return response; // return the data
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("An error occurred while retrieving Company data." + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Get All Data from Company if their profile is set to visible
         public async Task<List<CompanyModel>> ReadAllCompanyData()
         {
             try
@@ -80,48 +97,75 @@ namespace ElevPortalen.Services
         #endregion
 
         #region Company Update function
-        public async Task<string> Update(CompanyModel company)
+        public async Task<(string, bool)> Update(CompanyModel company)
         {
             try
             {
+                _context.Entry(company).State = EntityState.Detached;
                 var entry = await _context.Company.FindAsync(company.CompanyId);
 
                 // If the response is not null
                 if (entry != null)
                 {
-                    entry.CompanyName = company.CompanyName;
-                    entry.CompanyAddress = company.CompanyAddress;
-                    entry.Region = company.Region;
-                    entry.Email = company.Email;
-                    entry.Link = company.Link;
-                    entry.Preferences = company.Preferences;
-                    entry.Description = company.Description;
-                    entry.PhoneNumber = company.PhoneNumber;
-                    entry.IsHiring = company.IsHiring;
-                    entry.IsVisible = company.IsVisible;
-                    entry.UpdatedDate = DateTime.Now;
+                    if (!AreEntitiesEqual(entry, company))
+                    {
+                        // Update entity properties
+                        entry.CompanyName = company.CompanyName;
+                        entry.CompanyAddress = company.CompanyAddress;
+                        entry.Region = company.Region;
+                        entry.Email = company.Email;
+                        entry.Link = company.Link;
+                        entry.Preferences = company.Preferences;
+                        entry.Description = company.Description;
+                        entry.profileImage = company.profileImage;
+                        entry.PhoneNumber = company.PhoneNumber;
+                        entry.IsHiring = company.IsHiring;
+                        entry.IsVisible = company.IsVisible;
+                        entry.UpdatedDate = DateTime.Now;
 
-                    _context.Entry(entry).State = EntityState.Modified;
-                    await _context.SaveChangesAsync();
+                        _context.Entry(entry).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
 
-                    return $"Updated successfully";
+                        return ($"Updated successfully", true);
+                    }
+                    else
+                    {
+                        return ($"No changes were made", true);
+                    }
                 }
                 else
                 {
-                    return $"Entry not found"; // Return a message when the entry is not found
+                    return ($"Update failed.", false);  // Return a message when update failed
                 }
 
             }
             catch (Exception ex)
             {
                 // Return an error message if an exception occurs
-                throw new InvalidOperationException($"Error occured while update: {ex.Message}");
+                throw new InvalidOperationException($"Error occurred while updating: {ex.Message}");
             }
         }
         #endregion
 
+        #region Helper method to check if two CompanyModel entities are equal
+        private bool AreEntitiesEqual(CompanyModel entry, CompanyModel company)
+        {
+            return entry.CompanyName == company.CompanyName &&
+            entry.CompanyAddress == company.CompanyAddress &&
+            entry.Region == company.Region &&
+            entry.Email == company.Email &&
+            entry.Link == company.Link &&
+            entry.Preferences == company.Preferences &&
+            entry.Description == company.Description &&
+            entry.profileImage == company.profileImage &&
+            entry.PhoneNumber == company.PhoneNumber &&
+            entry.IsHiring == company.IsHiring &&
+            entry.IsVisible == company.IsVisible;
+        }
+        #endregion
+
         #region Delete Company function
-        public async Task<string> Delete(int companytId)
+        public async Task<(string, bool)> Delete(int companytId)
         {
             try
             {
@@ -139,11 +183,11 @@ namespace ElevPortalen.Services
                     _context.Company.Remove(company);
                     await _context.SaveChangesAsync();
 
-                    return "The User Profile deleted Successfully.";
+                    return ("The Profile deleted Successfully.", true);
                 }
                 else
                 {
-                    return "Student not found.";
+                    return ("Student not found.", false);
                 }
             }
             catch (Exception ex)
@@ -153,7 +197,7 @@ namespace ElevPortalen.Services
         }
         #endregion
 
-        #region Get Company by Id
+        #region Get Company by Id (Model)
         public async Task<CompanyModel> GetCompanyById(int companyId)
         {
             try
@@ -167,11 +211,36 @@ namespace ElevPortalen.Services
                 {
                     throw new InvalidOperationException("Company not found.");
                 }
-                
+
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"An error occurred while retrieving Company data: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Get Company by Id to list
+        public async Task<List<CompanyModel>> GetCompanyByIdToList(int Id)
+        {
+            try
+            {
+                var company = await _context.Company
+                    .Where(c => c.CompanyId == Id).ToListAsync();
+
+                if (company != null)
+                {
+                    return company;
+                }
+                else
+                {
+                    // Throw an exception if no student found
+                    throw new InvalidOperationException($"No company found with Id: {Id}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"{ex.Message}");
             }
         }
         #endregion
@@ -246,7 +315,7 @@ namespace ElevPortalen.Services
         #endregion
 
         #region Recover the data function for Company
-        public async Task<string> RecoverCompanyData(Guid id)
+        public async Task<(string, bool)> RecoverCompanyData(Guid id)
         {
             try
             {
@@ -267,10 +336,10 @@ namespace ElevPortalen.Services
                         Preferences = recoveryData.Preferences,
                         Description = recoveryData.Description,
                         profileImage = recoveryData.profileImage,
-                        PhoneNumber= recoveryData.PhoneNumber,
-                        IsHiring= recoveryData.IsHiring,
-                        IsVisible= recoveryData.IsVisible,
-                        RegisteredDate= recoveryData.RegisteredDate,
+                        PhoneNumber = recoveryData.PhoneNumber,
+                        IsHiring = recoveryData.IsHiring,
+                        IsVisible = recoveryData.IsVisible,
+                        RegisteredDate = recoveryData.RegisteredDate,
                         UpdatedDate = DateTime.Now
                     };
                     // Add the recovered company to the main context
@@ -283,18 +352,43 @@ namespace ElevPortalen.Services
                     await _context.SaveChangesAsync();
                     await _recoveryContext.SaveChangesAsync();
 
-                    return "Data successfully recovered.";
+                    return ("Data successfully recovered.", true);
                 }
                 else
                 {
                     // Return a message indicating that recovery data does not exist
-                    return $"No recovery data found for UserId: {id}.";
+                    return ("No recovery data found for UserId: {id}.", false);
                 }
             }
             catch (Exception ex)
             {
                 // Return an error message if an exception occurs
                 throw new InvalidOperationException($"Error recovering data: {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region Get a Company by its Guid
+        public async Task<CompanyModel?> GetCompanyByGuid(Guid id)
+        {
+            try
+            {
+                var company = await _context.Company.FirstOrDefaultAsync(c => c.UserId == id);
+
+                if (company != null)
+                {
+                    return company;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw new InvalidOperationException($"An error occurred while retrieving company data: {ex.Message}");
+
             }
         }
         #endregion

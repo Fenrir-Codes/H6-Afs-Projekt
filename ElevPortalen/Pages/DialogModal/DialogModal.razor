@@ -1,0 +1,341 @@
+﻿<!-- Lavet af Jozsef -->
+@using ElevPortalen.Models
+@using ElevPortalen.Pages.AlertBox
+@using ElevPortalen.Pages.DialogModal.CompanyDialog
+@using ElevPortalen.Pages.DialogModal.JobOfferDialog
+@using ElevPortalen.Pages.DialogModal.MessageDialog
+@using ElevPortalen.Pages.DialogModal.StudentDialog
+@using ElevPortalen.Services
+
+@inject StudentService _studentService
+@inject CompanyService _companyService
+@inject MessageService _messageService
+@inject JobService _jobService
+
+<!-- Modal -->
+<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@DisplayStyle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-body p-0 bg-dark text-white">
+
+                @if (isStudent && !MessageDialog)
+                {
+                    <UpdateStudentDialog Model="_studentToUpdate"></UpdateStudentDialog>
+                }
+                else if (isCompany && !MessageDialog)
+                {
+                    <UpdateCompanyDialog Model="_companyToUpdate"></UpdateCompanyDialog>
+                }
+                else if (MessageDialog)
+                {
+                    <MessageDialog Model="_messageToSend" MessageTo="@_messageTo" ReceiverId="@_recieverId" SenderId="@_sendererId"></MessageDialog>
+                }
+                else if (JobOfferDialog)
+                {
+                    <JobOfferDialog job="_job" textOfHeader="@jobDialogHeaderText"></JobOfferDialog>
+                }
+                else
+                {
+                    <AlertBox IsVisible=true Message="Error in - DialogModal Component" waitForSeconds="0" isWarning=true></AlertBox>
+                }
+
+            </div>
+
+            <!--Footer of the update page-->
+            <div class="modal-footer d-flex justify-content-center bg-dark text-white">
+
+                @if (isStudent && !MessageDialog)
+                {
+                    <button type="button" class="btn btn-success" @onclick=@SubmitUpdateStudent>Update</button>
+                }
+                else if (isCompany && !MessageDialog)
+                {
+                    <button type="button" class="btn btn-success" @onclick=@SubmitUpdateCompany>Update</button>
+                }
+                else if (JobOfferDialog && JobOfferUpdateButton && !MessageDialog)
+                {
+                    <button type="button" class="btn btn-success" @onclick=@UpdateJobOffer>Update job</button>
+                }
+                else if (JobOfferDialog && !MessageDialog)
+                {
+                    <button type="button" class="btn btn-success" @onclick=@CreateJobOffer>Opret job</button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-success" @onclick=@SubmitMessage>Send</button>
+                }
+
+                <button type="button" class="btn btn-danger" @onclick=@Close>Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<AlertBox @ref=_alertBox />
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+
+    #region Initialize parameter and fields , models
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+
+    public StudentModel _studentToUpdate = new StudentModel();
+    private CompanyModel _companyToUpdate = new CompanyModel();
+    private MessageModel _messageToSend = new MessageModel();
+    private JobOfferModel _job = new JobOfferModel();
+    private AlertBox _alertBox = new AlertBox();
+
+    private string _Message = "";
+    private string jobDialogHeaderText = "";
+
+    public string DisplayStyle = "none;";
+    public string ModalClass = "";
+
+    public bool ShowBackdrop = false;
+    private bool isStudent = false;
+    private bool isCompany = false;
+
+    // Message dialog fields
+    private bool MessageDialog = false;
+    private bool JobOfferDialog = false;
+    private bool JobOfferUpdateButton = false;
+
+    private string? _messageTo { get; set; }
+    private int _recieverId { get; set; }
+    private int _sendererId { get; set; }
+    // sent it to job offer dialog
+    private int _companyId { get; set; }
+
+    #endregion
+
+    #region Handle validation submit (SubmitUpdate for Student)
+    private async Task SubmitUpdateStudent()
+    {
+        try
+        {
+            var (message, success) = await _studentService.Update(_studentToUpdate); //calling update from service
+            if (success)
+            {
+                _alertBox.SetMessage(true, message, 2000, success: true);
+            }
+            else
+            {
+                _alertBox.SetMessage(true, message, 10000, danger: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            _Message = $"An error occurred sucessfully - " + ex.Message;
+            _alertBox.SetMessage(true, _Message, 10000, danger: true);
+        }
+        await Close();
+    }
+    #endregion
+
+    #region Handle validation submit (SubmitUpdate for Company)
+    private async Task SubmitUpdateCompany()
+    {
+        try
+        {
+            var (message, success) = await _companyService.Update(_companyToUpdate); //calling update from service
+            if (success)
+            {
+                _alertBox.SetMessage(true, message, 2000, success: true);
+            }
+            else
+            {
+                _alertBox.SetMessage(true, message, 10000, danger: true);
+            }
+
+        }
+        catch (Exception ex)
+        {          
+            _Message = $"An error occurred sucessfully - " + ex.Message;
+            _alertBox.SetMessage(true, _Message,0, danger: true);
+        }
+        await Close();
+    }
+    #endregion
+
+    #region Handle validation submit (SubmitUpdate for Message)
+    private async Task SubmitMessage()
+    {
+        try
+        {         
+            var (message, success) = await _messageService.SendMessage(_messageToSend);
+            if (success)
+            {
+                _alertBox.SetMessage(true, message, 2000, success: true);
+                await Close();
+            }
+            else
+            {
+                _alertBox.SetMessage(true, message, 10000, danger: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            _Message = $"An error occurred - " + ex.Message;
+            _alertBox.SetMessage(true, _Message, 0, danger: true);
+        }
+    }
+    #endregion
+
+    #region Create job offer button
+    private async Task CreateJobOffer()
+    {
+        var (message, success) = await _jobService.Create(_job);
+        if (success)
+        {
+            _alertBox.SetMessage(true, message, 2000, success:true);
+        }
+        else
+        {
+            _alertBox.SetMessage(true, message, 0, danger:true);
+        }
+        await Close();
+    }
+    #endregion
+
+    #region Update job offer button
+    private async Task UpdateJobOffer()
+    {
+        var (message, success) = await _jobService.Update(_job);
+        if (success)
+        {
+            _alertBox.SetMessage(true, message, 2000, success: true);
+        }
+        else
+        {
+            _alertBox.SetMessage(true, message, 0, danger: true);
+        }
+        await Close();
+    }
+    #endregion
+
+    #region Open Student update
+    public async Task OpenStudentUpdate(int Id)
+    {
+        isStudent = true;
+        DisplayStyle = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+
+        _studentToUpdate = await _studentService.GetStudentById(Id);
+    }
+    #endregion
+
+    #region Open Company Update
+    public async Task OpenCompanyUpdate(int Id)
+    {
+        isCompany = true;
+        DisplayStyle = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+
+        _companyToUpdate = await _companyService.GetCompanyById(Id);
+    }
+    #endregion
+
+    #region Message Dialog
+    public void OpenMessageDialog(int recieverId, int senderId, string? firstName, string? lastName)
+    {
+        MessageDialog = true;
+        _recieverId = recieverId;
+        _sendererId = senderId;
+        _messageTo = firstName + " " + lastName;
+
+        DisplayStyle = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+    }
+    #endregion
+
+    #region Message Dialog
+    public void OpenAnswareDialog(int senderId, int recieverId, string? firstName, string? lastName,string? subject, string? content)
+    {
+        MessageDialog = true;
+        _recieverId = senderId;
+        _sendererId = recieverId;
+        _messageTo = firstName + " " + lastName;
+        _messageToSend.SenderName = firstName + lastName;
+        _messageToSend.Subject = "Re: " + subject;
+
+        DisplayStyle = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+    }
+    #endregion
+
+    #region open Job Offer Dialog
+    public void OpenJobOfferDialog(int companyId, string? companyName)
+    {
+        jobDialogHeaderText = "Opret Jobtilbud";
+        JobOfferDialog = true;
+        _job.CompanyId = companyId;
+        _job.CompanyName = companyName;
+
+        DisplayStyle = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+    }
+    #endregion
+
+    #region open Job Offer Update Dialog
+    public async Task OpenJobOfferUpdateDialog(int jobOfferId)
+    {
+        jobDialogHeaderText = "Update Jobtilbud";
+        JobOfferDialog = true;
+        JobOfferUpdateButton = true;
+
+        DisplayStyle = "block;";
+        ModalClass = "show";
+        ShowBackdrop = true;
+
+        var (message, success, data) = await _jobService.GetOfferWithJobId(jobOfferId);
+        if (success)
+        {
+            _job = data;
+        }
+        else
+        {
+            _alertBox.SetMessage(true, message, 0 ,warning:true);
+        }
+
+    }
+    #endregion
+
+    #region Close Function
+    public Task Close()
+    {
+        isCompany = false;
+        isStudent = false;
+        JobOfferDialog = false;
+        JobOfferUpdateButton = false;
+
+        ResetModels();
+
+        DisplayStyle = "none";
+        ModalClass = "";
+        ShowBackdrop = false;
+        return OnClose.InvokeAsync(true);
+    }
+    #endregion
+
+    #region reset the models
+    private void ResetModels()
+    {
+        _studentToUpdate = new();
+        _companyToUpdate = new();
+        _job = new();
+    }
+    #endregion
+
+
+}

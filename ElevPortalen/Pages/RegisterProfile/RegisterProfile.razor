@@ -1,7 +1,8 @@
-﻿@page "/registerprofile"
+﻿<!-- Lavet af Jozsef -->
+@page "/registerprofile"
 
-@*Lavet af Jozsef*@
 @using ElevPortalen.Models
+@using ElevPortalen.Pages.AlertBox
 @using ElevPortalen.Services
 @using ElevPortalen.Data;
 @using System.Text.Json
@@ -12,58 +13,69 @@
 @inject CompanyService _companyService
 @inject StudentService _studentService
 @inject SkillService _skillService
+@inject ImageUploadService _imageUploadService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IConfiguration Configuration
 @inject NavigationManager NavManager
 
 <PageTitle>Register</PageTitle>
 
-<div class="container">
+<div class="container-fluid">
 
     <AuthorizeView Roles="Student">
 
         <Authorized>
-            <div class="container d-flex align-content-center justify-content-center">
-                <div class="col-xl-12">
-                    <br />
+            <div class="d-flex align-content-center justify-content-center">
+
                     <!-- Account details card-->
-                    <div class="card mb-4">
-                        <div class="card-header fw-bold">Registrer Kontooplysninger</div>
-                        <div class="card-body">
+                    <div class="card mt-4 mb-4 col-xl-12">
+                        <div class="card-header fw-bold text-white bg-dark">Registrer Kontooplysninger</div>
+                        <div class="card-body text-white bg-dark">
                             <form>
-                                <div class="col-md-6">
-                                    <label class="small mb-1 fw-bold" for="title">Title</label>
-                                    <input class="form-control" id="title" type="text"
-                                           placeholder="Skriv Din titel" @bind="_studentData.Title">
-                                </div>
-                                <!-- Form Row-->
-                                <div class="row gx-3 mb-3">
-                                    <!-- Form Group (Name)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1 fw-bold" for="firstname">Fornavn</label>
+                                <!-- Row -->
+                                <div class="row gx-3 mb-3 mt-3">
+                                    <!-- Title -->
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="title">Title</label>
+                                        <input class="form-control" id="title" type="text"
+                                               placeholder="f.eks. Datatekniker" @bind="_studentData.Title">
+                                    </div>
+                                    <!-- Name -->
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="firstname">Fornavn</label>
                                         <input class="form-control" id="firstname" type="text"
                                                placeholder="Fornavn" @bind="_studentData.FirstName">
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="small mb-1 fw-bold" for="middlename">Mellemnavn</label>
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="middlename">Mellemnavn</label>
                                         <input class="form-control" id="middlename" type="text"
                                                placeholder="Mellemnavn (hvis du har)" @bind="_studentData.MiddleName">
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="small mb-1 fw-bold" for="flastname">Efternavn</label>
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="flastname">Efternavn</label>
                                         <input class="form-control" id="lastname" type="text"
                                                placeholder="Efternavn" @bind="_studentData.LastName">
                                     </div>
+                                </div>
+                                <!-- Row -->
+                                <div class="row gx-3 mb-2">
                                     <!--Email-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1 fw-bold" for="Email">Email</label>
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="Email">Email</label>
                                         <input class="form-control" id="Email" type="email"
                                                placeholder="example@example.com" @bind="_studentData.Email">
                                     </div>
-                                    <!-- Form Group (address)-->
-                                    <div class="col-md-6">
-                                        <label class="small mb-1 fw-bold" for="inputaddress">Addresse</label>
-                                        <input class="form-control" list="addressSuggestions" @bind="_studentData.Address" placeholder="Enter address" @oninput="UpdateDropdownWithDelay">
+                                    <!--Phone-->
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="inputPhone">Mobil</label>
+                                        <input class="form-control" type="tel" id="inputPhone" name="phone"
+                                               placeholder="8 cifre" @bind="_studentData.PhoneNumber" required>
+                                    </div>
+                                    <!-- address -->
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="inputaddress">Addresse</label>
+                                        <input class="form-control" list="addressSuggestions" @bind="_studentData.Address" placeholder="Enter address"
+                                               @oninput="UpdateDropdownWithDelay">
                                         <datalist id="addressSuggestions">
                                             @foreach (var item in address)
                                             {
@@ -75,129 +87,173 @@
                                             }
                                         </datalist>
                                     </div>
-                                    <!--Phone-->
-                                    <div class="mb-3 col-md-6">
-                                        <label class="small mb-1 fw-bold" for="inputPhone">Mobil</label>
-                                        <input class="form-control" type="tel" id="inputPhone" name="phone"
-                                               placeholder="12 34 56 78" @bind="_studentData.PhoneNumber" required>
-                                    </div>
-                                </div>
-                                <!-- Form Row -->
-                                <div class="row gx-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="small mb-1 fw-bold" for="_speciality">Specialisering</label>
+                                    <div class="col-md-3">
+                                        <label class="mb-1 fw-bold" for="_speciality">Specialisering</label>
                                         <select class="form-select form-select-md" @bind="_studentData.Speciality" id="_speciality" aria-label="Region" required>
-                                            <option value="" disabled selected>Vælg dit speciale</option>
+                                            <option disabled selected>Vælg dit speciale</option>
                                             <option value="It-Support">It-Supporter</option>
                                             <option value="Infrastrukture">Infrastruktur</option>
                                             <option value="Programmering">Programmering</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <label class="mb-1 form-label fw-bold" for="_Skills">Færdigheder</label>
-                                    <div class="col-md-3 mb-2">
-                                        <label class="mb-1 small form-label fw-bold" for="_Skills">Programmeringssprog</label>
-
-                                        <div class="row">
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.CSharp" /> C#
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.Java" /> Java
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.DotNet" /> .Net
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.Typescript" /> TypeScript
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.Python" /> Python
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-2">
-                                        <div class="row">
-                                            <label class="mt-4">
-                                                <input type="checkbox" @bind="_Skills.PHP" /> PHP
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.CPlusPlus" /> C++
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.C" /> C
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.Blazor" /> Blazor
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.JavaScript" /> JavaScript
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-3">
-                                        <label class="mb-1 small form-label fw-bold" for="_Skills">Web-udvikling</label>
-
-                                        <div class="row">
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.Bootstrap" /> Bootstrap
-                                            </label>
-
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.HTML" /> Html
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.CSS" /> CSS
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.SQL" /> SQL
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.NetWork" /> Network
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-2">
-                                        <label class="mb-1 small form-label fw-bold" for="_Skills">Andet</label>
-
-                                        <div class="row">
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.OfficePack" /> Office pakken
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.CloudComputing" /> Cloud technologies
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.VersionControl" /> Git / GitHub
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.Communikation" /> Kommunikation
-                                            </label>
-                                             <label>
-                                                <input type="checkbox" @bind="_Skills.ProblemSolving" /> Problemsolving
-                                            </label>
-                                            <label>
-                                                <input type="checkbox" @bind="_Skills.TeamWorking" /> Team work
-                                            </label>
-                                        </div>
+                                <!-- Row -->
+                                <div class="row gx-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="mb-1 fw-bold" for="_picture">Image</label>
+                                    <InputFile OnChange="@UploadImage" class="form-control" multiple accept=".png,.jpg,.jpeg" />
                                     </div>
                                 </div>
 
+                                <!-- Accordion -->
+                                <div class="accordion accordion-flush mb-3" id="accordionFlush">
+                                    <!-- Accordion item 1 - Links -->
+                                    <div class="accordion-item bg-dark">
+                                        <h2 class="accordion-header" id="flush-headingOne">
+                                            <button class="accordion-button collapsed text-white fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                Tilføj Social Links
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse bg-dark text-white" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlush">
+                                            <div class="accordion-body">
+                                                <div class="row gx-3 mb-3">
+                                                    <div class="col-md-3">
+                                                        <label class="mb-1 fw-bold" for="FBook">Facebook</label>
+                                                        <input class="form-control" id="FBook" type="text"
+                                                               placeholder="www.facebook.com/yourprofile" @bind="_studentData.FacebookLink">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="mb-1 fw-bold" for="linkedin">LinkedIn</label>
+                                                        <input class="form-control" id="linkedin" type="text"
+                                                               placeholder="www.linkedin.com/in/yourProfile" @bind="_studentData.LinkedInLink">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="mb-1 fw-bold" for="Insta">Instagram</label>
+                                                        <input class="form-control" id="Insta" type="text"
+                                                               placeholder="www.instagram.com/yourProfileName" @bind="_studentData.InstagramLink">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="mb-1 fw-bold" for="Github">Github</label>
+                                                        <input class="form-control" id="Github" type="text"
+                                                               placeholder="www.github.com/yourProfileName" @bind="_studentData.GitHubLink">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Accordion item 2 - skills -->
+                                    <div class="accordion-item bg-dark">
+                                        <h2 class="accordion-header" id="flush-headingTwo">
+                                            <button class="accordion-button collapsed text-white fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                Tilføj Færdigheder
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse bg-dark text-white" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlush">
+                                            <div class="accordion-body">
+                                                <div class="row">
+                                                    <div class="col-md-3 mb-2">
+                                                        <label class="mb-1 small form-label fw-bold" for="_Skills">Programmeringssprog</label>
+                                                        <div class="row">
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.CSharp" /> C#
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.Java" /> Java
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.DotNet" /> .Net
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.Typescript" /> TypeScript
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.Python" /> Python
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 mb-2">
+                                                        <div class="row">
+                                                            <label class="mt-4">
+                                                                <input type="checkbox" @bind="_Skills.PHP" /> PHP
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.CPlusPlus" /> C++
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.C" /> C
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.Blazor" /> Blazor
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.JavaScript" /> JavaScript
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 mb-2">
+                                                        <label class="mb-1 small form-label fw-bold" for="_Skills">Web-udvikling</label>
+
+                                                        <div class="row">
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.Bootstrap" /> Bootstrap
+                                                            </label>
+
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.HTML" /> Html
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.CSS" /> CSS
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.SQL" /> SQL
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.NetWork" /> Network
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3 mb-2">
+                                                        <label class="mb-1 small form-label fw-bold" for="_Skills">Andet</label>
+
+                                                        <div class="row">
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.OfficePack" /> Office pakken
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.CloudComputing" /> Cloud technologies
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.VersionControl" /> Git / GitHub
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.Communikation" /> Kommunikation
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.ProblemSolving" /> Problemsolving
+                                                            </label>
+                                                            <label>
+                                                                <input type="checkbox" @bind="_Skills.TeamWorking" /> Team work
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- Form Group (Description)-->
                                 <div class="col-md-12 mb-3">
                                     <label for="Description" class="form-label">Beskrivelse</label>
-                                    <textarea class="form-control" @bind="_studentData.Description" id="_description" rows="4"></textarea>
+                                    <textarea class="form-control" @bind="_studentData.Description" id="_description" rows="13"></textarea>
                                 </div>
 
-                                <InputFile OnChange="@LoadFiles" class="form-control" multiple accept=".png,.jpg,.jpeg" />
                             </form>
 
-                            <button class="btn btn-outline-success mt-2" @onclick="CreateStudentProfile">Gem</button>
+                            <button class="btn btn-success mt-2" @onclick="CreateStudentProfile">Gem</button>
 
                         </div>
                     </div>
-                </div>
+
             </div>
         </Authorized>
 
@@ -211,7 +267,7 @@
                     <br />
                     <!-- Account details card-->
                     <div class="card mb-4">
-                        <div class="card-header">Registrer Kontooplysninger For Dit Firma</div>
+                        <div class="card-header text-white bg-dark fw-bold">Registrer Kontooplysninger For Dit Firma</div>
                         <div class="card-body">
                             <form>
                                 <!-- Form Row-->
@@ -239,12 +295,12 @@
                                     </div>
                                 </div>
                                 <!-- Form Row        -->
-                                <div class="row gx-3 mb-3">
+                                <div class="row gx-3 mb-">
                                     <!-- Form Group (Region)-->
                                     <div class="mb-3 col-md-6">
                                         <label class="small mb-1 fw-bold" for="_region">Din Region</label>
                                         <select class="form-select form-select-md" @bind="_companyData.Region" id="_region" aria-label="Region">
-                                            <option disabled selected></option>
+                                            <option selected disabled>Vælg region</option>
                                             <option value="Region Nordjylland">Region Nordjylland</option>
                                             <option value="Region Midtjylland">Region Midtjylland</option>
                                             <option value="Region Syddanmark">Region Syddanmark</option>
@@ -261,13 +317,13 @@
                                     <div class="mb-3 col-md-6">
                                         <label class="small mb-1 fw-bold" for="inputPhone">Phone Number</label>
                                         <input class="form-control" type="tel" id="inputPhone" name="phone"
-                                               placeholder="8 cifre" @bind="_companyData.PhoneNumber">
+                                               placeholder="8 cifre" @bind="_companyData.PhoneNumber" maxlength="8" pattern="[0-9]{8}" required>
                                     </div>
                                     <!-- webLink -->
                                     <div class="mb-3 col-md-6">
                                         <label class="small mb-1 fw-bold" for="inputWebsite">Firma link</label>
                                         <input class="form-control" id="inputWebsite" type="text"
-                                               placeholder="Indtast Webstedslink" @bind="_companyData.Link">
+                                               placeholder="pattern: www.example.dk" @bind="_companyData.Link">
                                     </div>
                                 </div>
                                 <!-- Form Row-->
@@ -277,17 +333,21 @@
                                         <label class="small mb-1 fw-bold" for="_preferences">Preference</label>
                                         <select class="form-select form-select-md" @bind="_companyData.Preferences" id="_preferences"
                                                 aria-label="Preferences">
-                                            <option value="" disabled selected></option>
+                                            <option selected disabled>Vælg specialisering</option>
                                             <option value="It-Supporter">It-Supporter</option>
                                             <option value="Infrastructure">Infrastruktur</option>
                                             <option value="Programmer">Programmør</option>
                                         </select>
                                     </div>
+                                    <div class="col-md-6">
+                                        <label class="small mb-1 fw-bold" for="_picture">Image</label>
+                                        <InputFile OnChange="@UploadImage" class="form-control" multiple accept=".png,.jpg,.jpeg" />
+                                    </div>
                                 </div>
                                 <!-- Form Group (Description)-->
                                 <div class="col-md-12 mb-3">
                                     <label for="Description" class="form-label fw-bold">Beskrivelse</label>
-                                    <textarea class="form-control" @bind="_companyData.Description" id="_description" rows="4"></textarea>
+                                    <textarea class="form-control" @bind="_companyData.Description" id="_description" rows="8"></textarea>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" @bind="_companyData.IsHiring">
@@ -303,7 +363,7 @@
                                 </div>
 
                             </form>
-                            
+
                             <button class="btn btn-outline-success mt-2" @onclick="CreateCompanyProfile">Gem</button>
 
                         </div>
@@ -314,32 +374,32 @@
 
     </AuthorizeView>
 
+    <AlertBox @ref="_alertBox" />
+
 </div>
 
 @code {
+
     #region fields
 
     private AuthenticationState? _authState;
 
     //Fileupload
     private string? _newFileName = "";
-    private long maxFileSize = 1024 * 1024 * 1; // represents 3MB
-    private int maxAllowedFiles = 1;
-    private List<string> errors = new();
 
     //address lookup
     private string? searchTerm;
-    private string? selectedAddress;
-    private string Message = "";
+    private string? Message = "";
 
     //models
     private SkillModel _Skills = new SkillModel();
     private StudentModel _studentData = new StudentModel();
     private CompanyModel _companyData = new CompanyModel();
     private List<AddressModel> address = new List<AddressModel>();
+    //Messagebox
+    private AlertBox _alertBox = new AlertBox();
 
     //booleans
-    private bool showDropdown;
     private bool isAuthenticated = false;
 
     private CancellationTokenSource? cancellationTokenSource;
@@ -363,7 +423,7 @@
             }
         }
     }
-    # endregion
+    #endregion
 
     #region Create Student Profile Function
     private async Task CreateStudentProfile()
@@ -397,30 +457,42 @@
                                 profileImage = _newFileName,
                                 Speciality = _studentData.Speciality,
                                 PhoneNumber = _studentData.PhoneNumber,
+                                FacebookLink = _studentData.FacebookLink,
+                                LinkedInLink = _studentData.LinkedInLink,
+                                InstagramLink = _studentData.InstagramLink,
+                                GitHubLink = _studentData.GitHubLink,
                                 RegisteredDate = DateTime.Now,
                                 UpdatedDate = DateTime.Now
 
                             };
 
-                        Message = await _studentService.CreateStudent(_studentData); //create student data
-                        await CreateSkills(_studentData.StudentId); //add the student skills
-                        NavManager.NavigateTo("/profile"); // return to profile
+                        var (message, success) = await _studentService.CreateStudent(_studentData); //create student data
+                        if (success)
+                        {
+                            await CreateSkills(_studentData.StudentId); //add the student skills
+                            NavManager.NavigateTo("/profile"); // return to profile
+                        }
+                        else
+                        {
+                            // Handle the exception and return an error message
+                            _alertBox.SetMessage(true, message, 0, danger: true);
+                        }
                     }
                     else
                     {
                         // Handle the exception and return an error message
-                        Message = $"Error parsing GUID";
+                        _alertBox.SetMessage(true, "Error parsing GUID", 0, danger: true);
                     }
                 }
             }
 
             // Default return statement if conditions are not met
-            Message = $"Unexpected error occurred";
+            _alertBox.SetMessage(true, "Unexpected error occurred", 0, danger: true);
         }
         catch (Exception ex)
         {
             // Handle the exception and return an error message
-            Message = $"Error: {ex.Message}";
+            _alertBox.SetMessage(true, $"Error: {ex.Message}", 0, danger: true);
         }
     }
     #endregion
@@ -428,7 +500,15 @@
     #region Add Skills Function
     private async Task CreateSkills(int studentId)
     {
-        var result = await _skillService.CreateSkills(studentId, _Skills);
+        var (message, success) = await _skillService.CreateSkills(studentId, _Skills);
+        if (success)
+        {
+            _alertBox.SetMessage(true, message, 5000, success: true);
+        }
+        else
+        {
+            _alertBox.SetMessage(true, message, 10000, danger: true);
+        }
     }
     #endregion
 
@@ -452,7 +532,7 @@
                     if (Guid.TryParse(userIdString, out Guid userId))
                     {
                         _companyData = new CompanyModel
-                        {
+                            {
                                 UserId = userId,
                                 CompanyName = _companyData.CompanyName,
                                 CompanyAddress = _companyData.CompanyAddress,
@@ -467,26 +547,34 @@
                                 IsVisible = _companyData.IsVisible,
                                 UpdatedDate = DateTime.Now,
                                 RegisteredDate = DateTime.Now,
-                        };
+                            };
 
-                        Message = await _companyService.CreateCompany(_companyData);
-                        NavManager.NavigateTo("/profile");
+                        var (message, success) = await _companyService.CreateCompany(_companyData);
+                        if (success)
+                        {
+                            NavManager.NavigateTo("/profile");
+                        }
+                        else
+                        {
+                            // Handle the exception and return an error message
+                            _alertBox.SetMessage(true, message, 10000, danger: true);
+                        }
                     }
                     else
                     {
                         // Handle the exception and return an error message
-                        Message = $"Error parsing GUID";
+                        _alertBox.SetMessage(true, "Error parsing GUID", 10000, danger: true);
                     }
                 }
             }
 
             // Default return statement if conditions are not met
-            Message = $"Unexpected error occurred";
+            _alertBox.SetMessage(true, "Unexpected error occurred", 10000, danger: true);
         }
-        catch (Exception ex)
+        catch (Exception? ex)
         {
             // Handle the exception and return an error message
-            Message = $"Error: {ex.Message}";
+            _alertBox.SetMessage(true, $"Error: {ex.Message}", 10000, danger: true);
         }
     }
     #endregion
@@ -517,16 +605,23 @@
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             searchTerm = char.ToUpper(searchTerm[0]) + searchTerm.Substring(1);
-            var updatedAddress = await dawaService.GetAddress(searchTerm);
-            address = updatedAddress ?? new List<AddressModel>();
-            showDropdown = true;
-            <!-- Set showDropdown to true to display the datalist -->
+            var (addresses, errorMessage) = await dawaService.GetAddress(searchTerm);
+
+            if (addresses != null)
+            {
+                address = addresses;
+            }
+            else
+            {
+                // Handle the error case, show a message to the user
+                _alertBox.SetMessage(true, errorMessage, 10000, warning: true);
+            }
         }
         else
         {
-            <!-- Clear suggestions if searchTerm is empty -->
+            // Handle the case where the search term is empty, show a message to the user
+            _alertBox.SetMessage(true, "Please type your address.", 5000, warning: true);
             address = new List<AddressModel>();
-            showDropdown = false;
         }
 
         <!-- Trigger a re-render to update the UI -->
@@ -534,42 +629,21 @@
     }
     #endregion
 
-    #region Picture file input
-    private async Task LoadFiles(InputFileChangeEventArgs e)
+    #region Image upload via service
+    private async Task UploadImage(InputFileChangeEventArgs e)
     {
-        errors.Clear();
-
-        if (e.FileCount > maxAllowedFiles)
+        var (success, message) = await _imageUploadService.LoadFiles(e);
+        if (!success)
         {
-            errors.Add($"Error: Attempting to upload {e.FileCount} files, but only {maxAllowedFiles} files are allowed");
-            return;
+            //Handle error
+            _alertBox.SetMessage(true, message, 0, danger:true);
         }
-
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        else
         {
-            try
-            {
-                _newFileName = Path.ChangeExtension(
-                Path.GetRandomFileName(),
-                Path.GetExtension(file.Name));
-
-                string path = Path.Combine(
-                    Configuration.GetValue<string>("FileStorage")!,
-                    "",
-                    _newFileName);
-
-                Directory.CreateDirectory(Path.Combine(
-                    Configuration.GetValue<string>("FileStorage")!,
-                    ""));
-
-                await using FileStream fs = new(path, FileMode.Create);
-                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
-            }
-            catch (Exception ex)
-            {
-                errors.Add($"File: {file.Name} Error: {ex.Message}");
-            }
+            // or set the returned message to the filename if success
+            _newFileName = message;
         }
     }
     #endregion
+
 }

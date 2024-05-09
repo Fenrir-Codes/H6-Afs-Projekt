@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
+﻿/// <summary>
+///  Lavet af Jozsef
+/// </summary>
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace ElevPortalen.Pages
@@ -14,7 +16,7 @@ namespace ElevPortalen.Pages
             if (Envirounment.IsDevelopment())
                 return base.OnErrorAsync(ex);
             else
-            return Task.CompletedTask;
+                return Task.CompletedTask;
         }
     }
 }
