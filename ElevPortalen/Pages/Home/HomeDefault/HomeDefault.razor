@@ -20,8 +20,22 @@
 
         </div>
         <div>
-            <p> Studenter i databasen @studentCount</p>
-            <p> Firmaer i databasen @companyCount</p>
+            @if (studentCount == 0)
+            {
+                <p></p>
+            }
+            else
+            {
+                <p>Studenter i databasen @studentCount</p>
+            }
+            @if (companyCount == 0)
+            {
+                <p></p>
+            }
+            else
+            {
+                <p> Firmaer i databasen @companyCount</p>
+            }
         </div>
     </div>
 </div>
@@ -41,10 +55,9 @@
             studentCount = await _studentService.GetStudentCountAsync();
             companyCount = await _companyService.GetCompaniesCountAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _alertBox.SetMessage(true, $"An error occurred initializing the Default Home Page.",0, danger:true);
-            throw new InvalidOperationException($"{ex.Message}");
+            _alertBox.SetMessage(true, $"An error occurred initializing the Default Home Page.", 10000, danger:true);
         }
     }
     #endregion
