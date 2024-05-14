@@ -12,6 +12,7 @@
 @inject ElevPortalenDataDbContext _context
 @inject StudentService _studentService
 @inject CompanyService _companyService
+@inject AdminService _adminService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IConfiguration Configuration
 @inject NavigationManager NavManager
@@ -117,29 +118,41 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <!-- Fourth Card: Admin creation -->
+                    <!-- TODO placeholder text fades in the background -->
                     <div class="col-lg-6 col-xl-3 mb-2">
                         <div class="card bg-dark bg-gradient text-white h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="me-3">
-                                        <div class="text-white-75 small">
-                                            Something
-                                        </div>
+                                <div class="me-3">
+                                    <div class="text-white-75 small">
+                                        Opret ny Administrator
                                     </div>
-                                    <i class="fa-solid fa-comment fa-2xl"></i>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="inputEmail" placeholder="Email" @bind="email" style="::placeholder { color: black; }" />
+                                    <label for="inputEmail" class="text-white">Email</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="inputPassword" placeholder="Password" @bind="password" style="::placeholder { color: black; }" />
+                                    <label for="inputPassword" class="text-white">Password</label>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer">
-                                <div>View</div>
-                                <div href="#"><i class="fas fa-angle-right"></i></div>
+                            <div class="card-footer d-flex align-items-center justify-content-between small" @onclick="CreateAdmin" style="cursor:pointer">
+                                <div>Opret</div>
+                                <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
-                </div>
+
+
+
+                </div> <!--cards end-->
 
 
                 <!--More contect after the hr tag   , it can be a list of users etc...-->
-                @if (_listOfStudents.Any() || _listOfConpanies.Any())
+                @if (_listOfStudents.Any() || _listOfCompanies.Any())
                 {
                     <div class="card bg-dark bg-gradient text-white">
                         <div class="card-body">
@@ -199,7 +212,7 @@
                                 </nav>
 
                             }
-                            else if (_listOfConpanies.Any())
+                            else if (_listOfCompanies.Any())
                             {
                                 isCompany = true;
                                 <table class="table table-striped table-dark text-white">
@@ -302,7 +315,7 @@
 @code {
     // List of studentmodel and companymodel
     private List<StudentModel> _listOfStudents = new List<StudentModel>();
-    private List<CompanyModel> _listOfConpanies = new List<CompanyModel>();
+    private List<CompanyModel> _listOfCompanies = new List<CompanyModel>();
 
     private string? selectedSpecialization;
 
@@ -323,6 +336,11 @@
     private bool isStudent = false;
     private bool isCompany = false;
     private bool isLoaded = false;
+
+
+    private string email;
+    private string password;
+
 
     #region initialize
     protected override async Task OnInitializedAsync()
@@ -355,7 +373,7 @@
         isStudent = true;
         isCompany = false;
         _tableName = "Elever i Databasen";
-        _listOfConpanies.Clear();
+        _listOfCompanies.Clear();
         _listOfStudents = await _studentService.ReadAllStudentData();
         currentPage = 1;
     }
@@ -368,9 +386,26 @@
         isStudent = false;
         _tableName = "Firmaer i Databasen";
         _listOfStudents.Clear();
-        _listOfConpanies = await _companyService.ReadAllCompanyData();
+        _listOfCompanies = await _companyService.ReadAllCompanyData();
         currentPage = 1;
     }
+    #endregion
+
+    #region Create new admins
+
+    private async Task CreateAdmin() {
+        //check if email and password are not empty
+        if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(password)) {
+            await _adminService.CreateAdmin(email, password);
+            //clear the form fields after creating the admin
+            email = "";
+            password = "";
+        } else {
+            // Handle case where email or password is empty TODO
+
+        }
+    }
+
     #endregion
 
     #region Pagination Collections and change page function
@@ -382,8 +417,8 @@
 
     IEnumerable<CompanyModel> companiesToPage()
     {
-        TotalPagesCompanies = (int)Math.Ceiling((double)_listOfConpanies.Count / PageSize);
-        return _listOfConpanies.Skip((currentPage - 1) * PageSize).Take(PageSize);
+        TotalPagesCompanies = (int)Math.Ceiling((double)_listOfCompanies.Count / PageSize);
+        return _listOfCompanies.Skip((currentPage - 1) * PageSize).Take(PageSize);
     }
 
     // Pagination Change Page Function

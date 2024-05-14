@@ -22,7 +22,7 @@ namespace ElevPortalen.Models
         public string? Link { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         public string? Preferences { get; set; }
-        [Column(TypeName = "nvarchar(2000)")]
+        [Column(TypeName = "nvarchar(4000)")]
         public string? Description { get; set; }
         [Column(TypeName = "nvarchar(200)")]
         public string? profileImage { get; set; }

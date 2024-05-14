@@ -13,7 +13,7 @@ namespace ElevPortalen.Models
         public string? SenderName { get; set; } // Name of the Sender
         [Column(TypeName = "nvarchar(200)")]
         public string? Subject { get; set; }  // Subject of the message
-        [Column(TypeName = "nvarchar(2000)")]
+        [Column(TypeName = "nvarchar(4000)")]
         public string? Content { get; set; }  // Content of the message
         [Required]
         public DateTime Timestamp { get; set; }  // timestamp
