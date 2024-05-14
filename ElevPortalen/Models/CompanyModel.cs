@@ -30,6 +30,7 @@ namespace ElevPortalen.Models
         public int PhoneNumber { get; set; }
         public bool IsHiring { get; set; }
         public bool IsVisible { get; set; }
+        public bool IsVerified { get; set; }
         [Required]
         public DateTime RegisteredDate { get; set; }
         [Required]
