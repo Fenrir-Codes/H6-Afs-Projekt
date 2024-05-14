@@ -449,7 +449,7 @@
 
         var datasetStudent = new LineChartDataset()
             {
-                Label = "Students",
+                Label = "Lærlinge",
                 Data = studentData,
                 BackgroundColor = new List<string> { "#FF6384" },
                 BorderColor = new List<string> { "#FF6384" },
@@ -464,7 +464,7 @@
 
         var datasetsCompany = new LineChartDataset()
             {
-                Label = "Companies",
+                Label = "Firmaer",
                 Data = companyData,
                 BackgroundColor = new List<string> { "#36A2EB" },
                 BorderColor = new List<string> { "#36A2EB" },
@@ -487,13 +487,14 @@
         lineChartOptions.Responsive = true;
         lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
 
-        lineChartOptions.Scales.X!.Title!.Text = "2023";
+        lineChartOptions.Scales.X!.Title!.Text = "Måneder";
         lineChartOptions.Scales.X.Title.Display = true;
 
-        lineChartOptions.Scales.Y!.Title!.Text = "Registrations";
-        lineChartOptions.Scales.Y.Title.Display = true;
+        lineChartOptions.Scales.Y!.Title!.Text = "Registrerede";
+        lineChartOptions.Scales.Y.Title.Display = true;        
+                
 
-        lineChartOptions.Plugins.Title!.Text = "Monthly Registrations";
+        lineChartOptions.Plugins.Title!.Text = "Månedlige Registrationer";
         lineChartOptions.Plugins.Title.Display = true;
 
         isLoaded = true;
