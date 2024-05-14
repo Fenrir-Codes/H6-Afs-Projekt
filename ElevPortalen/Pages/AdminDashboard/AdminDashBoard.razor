@@ -66,7 +66,7 @@
                                 </div>
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer;" @onclick="GetAllStudent">
-                                <div>View</div>
+                                <div>Vis</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                                 </div>
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer" @onclick="GetAllCompany">
-                                <div>View</div>
+                                <div>Vis</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
@@ -112,7 +112,7 @@
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between small"
                                 @onclick="() => GetbySpeciality(selectedSpecialization)" style="cursor:pointer;">
-                                <div>View Filtered Results</div>
+                                <div>Vis Resultater</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
@@ -123,19 +123,26 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="me-3">
                                         <div class="text-white-75 small">
-                                            Something
+                                            Registration
                                         </div>
                                     </div>
-                                    <i class="fa-solid fa-comment fa-2xl"></i>
+                                    <i class="fa-solid fa-clock fa-2xl"></i>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer">
-                                <div>View</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer" @onclick="GetRegistration">
+                                <div>Vis</div>
                                 <div href="#"><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                @if (isRegistrered)
+                {
+                    <div class="d-flex justify-content-center align-items-center">
+                    <LineChart @ref="lineChart" Width="800" Class="mb-4" />
+                    </div>
+                }
 
 
                 <!--More contect after the hr tag   , it can be a list of users etc...-->
@@ -323,6 +330,12 @@
     private bool isStudent = false;
     private bool isCompany = false;
     private bool isLoaded = false;
+    private bool isRegistrered = false;
+
+    // Chart
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
 
     #region initialize
     protected override async Task OnInitializedAsync()
@@ -354,6 +367,7 @@
     {
         isStudent = true;
         isCompany = false;
+        isRegistrered = false;
         _tableName = "Elever i Databasen";
         _listOfConpanies.Clear();
         _listOfStudents = await _studentService.ReadAllStudentData();
@@ -366,6 +380,7 @@
     {
         isCompany = true;
         isStudent = false;
+        isRegistrered = false;
         _tableName = "Firmaer i Databasen";
         _listOfStudents.Clear();
         _listOfConpanies = await _companyService.ReadAllCompanyData();
@@ -415,4 +430,88 @@
     }
     #endregion
 
+    #region Chart of registration time
+    private async Task GetRegistration()
+    {
+        // Fetch data for students and companies
+        var studentRegistrationData = await _studentService.GetMonthlyRegistrationCountsStudent();
+        var companyRegistrationData = await _companyService.GetMonthlyRegistrationCountsCompany();
+
+        // Ensure we cover all months that either students or companies have registrations
+        var labels = studentRegistrationData.Keys.Union(companyRegistrationData.Keys).OrderBy(x => x).ToList();
+
+        // Convert the counts from the dictionaries into lists of doubles for the chart
+        var studentData = labels.Select(label => studentRegistrationData.ContainsKey(label) ? (double)studentRegistrationData[label] : 0).ToList();
+        var companyData = labels.Select(label => companyRegistrationData.ContainsKey(label) ? (double)companyRegistrationData[label] : 0).ToList();
+
+        var datasets = new List<IChartDataset>();
+
+        var datasetStudent = new LineChartDataset()
+            {
+                Label = "Students",
+                Data = studentData,
+                BackgroundColor = new List<string> { "#FF6384" },
+                BorderColor = new List<string> { "#FF6384" },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { "#FF6384" },
+                PointRadius = new List<int> { 3 },
+                PointHoverRadius = new List<int> { 4 },
+                Datalabels = new() { Align = "end", Anchor = "end" }
+            };
+        datasets.Add(datasetStudent);
+
+        var datasetsCompany = new LineChartDataset()
+            {
+                Label = "Companies",
+                Data = companyData,
+                BackgroundColor = new List<string> { "#36A2EB" },
+                BorderColor = new List<string> { "#36A2EB" },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { "#36A2EB" },
+                PointRadius = new List<int> { 3 },
+                PointHoverRadius = new List<int> { 4 },
+                Datalabels = new() { Align = "end", Anchor = "end" }
+            };
+        datasets.Add(datasetsCompany);
+
+        chartData = new ChartData
+            {
+                Labels = labels,
+                Datasets = datasets
+            };
+
+        lineChartOptions = new();
+        lineChartOptions.Responsive = true;
+        lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+
+        lineChartOptions.Scales.X!.Title!.Text = "2023";
+        lineChartOptions.Scales.X.Title.Display = true;
+
+        lineChartOptions.Scales.Y!.Title!.Text = "Registrations";
+        lineChartOptions.Scales.Y.Title.Display = true;
+
+        lineChartOptions.Plugins.Title!.Text = "Monthly Registrations";
+        lineChartOptions.Plugins.Title.Display = true;
+
+        isLoaded = true;
+        isRegistrered = true;
+        isCompany = false;
+        isStudent = false;
+        _listOfStudents.Clear();
+        _listOfConpanies.Clear();
+        await InvokeAsync(StateHasChanged);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isRegistrered)
+        {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    #endregion
 }

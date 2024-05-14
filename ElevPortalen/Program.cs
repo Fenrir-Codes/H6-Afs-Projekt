@@ -55,6 +55,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddBlazorBootstrap();
 
 //Services added by Jozsef
 builder.Services.AddScoped<CompanyService>();
