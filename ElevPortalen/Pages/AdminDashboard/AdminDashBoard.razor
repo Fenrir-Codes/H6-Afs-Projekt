@@ -12,6 +12,7 @@
 @inject ElevPortalenDataDbContext _context
 @inject StudentService _studentService
 @inject CompanyService _companyService
+@inject AdminService _adminService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IConfiguration Configuration
 @inject NavigationManager NavManager
@@ -434,8 +435,8 @@
     private async Task GetRegistration()
     {
         // Fetch data for students and companies
-        var studentRegistrationData = await _studentService.GetMonthlyRegistrationCountsStudent();
-        var companyRegistrationData = await _companyService.GetMonthlyRegistrationCountsCompany();
+        var studentRegistrationData = await _adminService.GetMonthlyRegistrationCountsStudent();
+        var companyRegistrationData = await _adminService.GetMonthlyRegistrationCountsCompany();
 
         // Ensure we cover all months that either students or companies have registrations
         var labels = studentRegistrationData.Keys.Union(companyRegistrationData.Keys).OrderBy(x => x).ToList();
