@@ -139,7 +139,7 @@
                                     <label for="inputPassword" class="text-white">Password</label>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex align-items-center justify-content-between small" @onclick="CreateAdmin" style="cursor:pointer">
+                            <div class="card-footer d-flex align-items-center justify-content-between small" @onclick="CreateAdmin" style="cursor:pointer"> <!--TODO look into validating pword-->
                                 <div>Opret</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
@@ -170,6 +170,7 @@
                                             <th class="tableheader" scope="col">E-mail</th>
                                             <th class="tableheader" scope="col">Telefonnummer</th>
                                             <th class="tableheader" scope="col">Specialisering</th>
+                                            <th class="tableheader" scope="col">Verificeret</th>
                                             <th class="tableheader" scope="col">Operationer</th>
                                         </tr>
                                     </thead>
@@ -184,6 +185,13 @@
                                                 <td>@student.PhoneNumber</td>
                                                 <td>@student.Speciality</td>
                                                 <td>
+                                                    @if (student.IsVerified) {
+                                                        <span>Ja</span>
+                                                    } else {
+                                                        <span>Nej</span>
+                                                    }
+                                                </td>
+                                                <td>
                                                     <div class="btn-group">
                                                         <button type="button" class="btn btn-operation dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Operation
@@ -191,6 +199,7 @@
                                                         <ul class="dropdown-menu">
                                                             <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenStudentUpdate(student.StudentId)">Opdater</a></li>
                                                             <li><a class="dropdown-item" href="#">Fjern</a></li>
+                                                            <li><a class="dropdown-item" @onclick="() => _adminService.VerifyStudent(student)">Verificer</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -337,7 +346,7 @@
     private bool isCompany = false;
     private bool isLoaded = false;
 
-
+    //admin email / pass for creation
     private string email;
     private string password;
 

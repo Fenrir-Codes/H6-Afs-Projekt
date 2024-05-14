@@ -1,4 +1,5 @@
 ﻿using ElevPortalen.Data;
+using ElevPortalen.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 
@@ -40,6 +41,22 @@ namespace ElevPortalen.Services
             } else {
                 // Handle creation failure, such as displaying errors
                 return (false, "Failed to create admin user.");
+            }
+        }
+
+        // VerifyStudent method to verify students:
+        public async Task<(bool success, string message)> VerifyStudent(StudentModel student) {
+            try {
+                // Update the IsVerified property of the student
+                student.IsVerified = true;
+
+                // Update the entity in the context and save changes
+                _DataDbcontext.Update(student);
+                await _DataDbcontext.SaveChangesAsync();
+
+                return (true, "Student verified successfully.");
+            } catch (Exception ex) {
+                return (false, $"An error occurred while verifying the student: {ex.Message}");
             }
         }
 
