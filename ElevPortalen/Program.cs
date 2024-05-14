@@ -58,6 +58,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 builder.Services.AddBlazorBootstrap();
 
 //Services added by Jozsef
+builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<CompanyService>();
 builder.Services.AddScoped<ElevPortalenDataDbContext>();
 builder.Services.AddScoped<StudentService>();
