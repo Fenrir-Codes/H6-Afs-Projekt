@@ -396,8 +396,3 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/ElevPortalen/Migrations
-/ElevPortalen/appsettings.json
-/.gitignore
-/.gitignore
-/.gitignore
