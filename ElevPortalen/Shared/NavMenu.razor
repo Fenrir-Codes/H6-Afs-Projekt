@@ -18,7 +18,7 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span>
+                <span class="mx-2 oi oi-home" aria-hidden="true"></span>
                 @if (!@IconMenuActive)
                 {
                     <label>Hjem</label>
@@ -27,7 +27,7 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/vacancies" Match="NavLinkMatch.All">
-                <span class="oi fa-solid fa-rectangle-list" aria-hidden="true"></span>
+                <span class="mx-2 oi fa-solid fa-rectangle-list" aria-hidden="true"></span>
                 @if (!@IconMenuActive)
                 {
                     <label>Ledige stillinger</label>
@@ -37,7 +37,7 @@
         <AuthorizeView Roles="Company,Student">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/profile" Match="NavLinkMatch.All">
-                    <span class="oi oi-person" aria-hidden="true"></span>
+                    <span class="mx-2 oi oi-person" aria-hidden="true"></span>
                     @if (!@IconMenuActive)
                     {
                         <label>Profil</label>
