@@ -109,3 +109,30 @@ program.cs file changes :
 
 
     paste it approx in line 77 but before line var app = builder.Build(); 
+
+
+    ---------------------------------------------------------------------------------------------------------------------------------------------
+    Other:  
+    just for make the migration and update easier
+
+
+    Migrations :
+
+     add-migration -context ApplicationDbContext
+
+     add-migration -context ElevPortalenDataDbContext
+
+     add-migration -context DataRecoveryDbContext
+
+     add-migration -context JobOfferDbContext
+
+
+    Update:
+
+     update-database -context ApplicationDbContext
+
+     update-database -context ElevPortalenDataDbContext
+
+     update-database -context DataRecoveryDbContext
+
+     update-database -context JobOfferDbContext
