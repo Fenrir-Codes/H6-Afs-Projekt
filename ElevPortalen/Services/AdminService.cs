@@ -1,9 +1,6 @@
 ﻿using ElevPortalen.Data;
-using ElevPortalen.Models;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Security.Claims;
 
 namespace ElevPortalen.Services
 {
@@ -26,7 +23,6 @@ namespace ElevPortalen.Services
         }
         #endregion
 
-
         // Name the functions as you like, and add more if needed.  service is integrated allready in program cs
 
         //Create
@@ -34,12 +30,13 @@ namespace ElevPortalen.Services
         // Update  ( Company and student update are already working, I'll just note that they are created with a completely different method. )
         //Delete
         //Other functions
-        #region Get registration date
+        #region Get registration date Student
         public async Task<Dictionary<string, double>> GetMonthlyRegistrationCountsStudent()
         {
             var monthlyCounts = await _DataDbcontext.Student
                 .GroupBy(s => new { s.RegisteredDate.Year, s.RegisteredDate.Month })
-                .Select(g => new {
+                .Select(g => new
+                {
                     Month = g.Key.Month,
                     Year = g.Key.Year,
                     Count = g.Count()
@@ -54,12 +51,13 @@ namespace ElevPortalen.Services
 
         #endregion
 
-        #region Get registration date
+        #region Get registration date Company
         public async Task<Dictionary<string, double>> GetMonthlyRegistrationCountsCompany()
         {
             var monthlyCounts = await _DataDbcontext.Company
                 .GroupBy(s => new { s.RegisteredDate.Year, s.RegisteredDate.Month })
-                .Select(g => new {
+                .Select(g => new
+                {
                     Month = g.Key.Month,
                     Year = g.Key.Year,
                     Count = g.Count()

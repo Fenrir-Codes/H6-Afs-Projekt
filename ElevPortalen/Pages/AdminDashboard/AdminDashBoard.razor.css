@@ -12,12 +12,9 @@
 .tableheader{
     background-color:yellowgreen;
     color:black;
-}
-
-.btn-operation {
-    background-color: yellowgreen;
-}
-
+}.dropdown-item:hover{
+     background-color:lightgray;
+ }
 
 .skeleton-card {
     box-shadow: none;

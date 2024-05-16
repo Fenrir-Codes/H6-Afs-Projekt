@@ -180,12 +180,12 @@
                                                 <td>@student.Speciality</td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <button type="button" class="btn btn-operation dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Operation
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenStudentUpdate(student.StudentId)">Opdater</a></li>
-                                                            <li><a class="dropdown-item" href="#">Fjern</a></li>
+                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenStudentUpdate(student.StudentId)" style="cursor:pointer">Opdater</a></li>
+                                                            <li><a class="dropdown-item" href="#" style="cursor:pointer">Fjern</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -258,12 +258,12 @@
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <button type="button" class="btn dropdown-toggle btn-operation" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Operation
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenCompanyUpdate(company.CompanyId)">Opdater</a></li>
-                                                            <li><a class="dropdown-item">Fjern</a></li>
+                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenCompanyUpdate(company.CompanyId)" style="cursor:pointer">Opdater</a></li>
+                                                            <li><a class="dropdown-item" style="cursor:pointer">Fjern</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
