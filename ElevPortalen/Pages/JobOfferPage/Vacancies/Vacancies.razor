@@ -80,14 +80,14 @@
     private async Task GetAllJobOffers()
     {
         var (list, message, success) = await _jobService.GetAllOffers();
-        isLoaded = success;
         if (success)
         {
+            isLoaded = success;
             _jobList = list;
         }
         else
         {
-            _alertBox.SetMessage(true, message, 0, warning:true);
+            _alertBox.SetMessage(true, message, 10000, warning:true);
         }
     }
     #endregion

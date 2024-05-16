@@ -4,6 +4,7 @@
 @using ElevPortalen.Pages.AlertBox
 @using ElevPortalen.Data;
 @using ElevPortalen.Pages.DialogModal
+@using ElevPortalen.Pages.SkeletonLoading
 @using ElevPortalen.Services;
 @using ElevPortalen.Models;
 @using Microsoft.AspNetCore.Components.Authorization
@@ -184,7 +185,7 @@
 }
 else
 {
-    <AlertBox IsVisible=true Message="Registrer dine profiloplysninger for at kontakte firmaer." waitForSeconds="10000" isWarning=true></AlertBox>
+    <ProfileSkeleton></ProfileSkeleton>
 }
 
 
@@ -260,6 +261,7 @@ else
             else
             {
                 isVisible = false;
+                _alertBox.SetMessage(true, "Registrer dine profiloplysninger for at kontakte firmaer", 10000, warning: true);
             }
         }
     }

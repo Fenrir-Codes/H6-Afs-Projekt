@@ -3,6 +3,7 @@
 
 @using ElevPortalen.Pages.AlertBox
 @using ElevPortalen.Data;
+@using ElevPortalen.Pages.SkeletonLoading
 @using ElevPortalen.Services;
 @using ElevPortalen.Models;
 @using ElevPortalen.Pages.DialogModal;
@@ -216,7 +217,7 @@
 }
 else
 {
-    <AlertBox IsVisible=true Message="Registrer dine profiloplysninger for at kontakte elever" waitForSeconds="10000" isWarning=true></AlertBox>
+    <ProfileSkeleton></ProfileSkeleton>
 }
 
 <!-- DialogModal for update view -->
@@ -306,6 +307,7 @@ else
             else
             {
                 isVisible = false;
+                _alertBox.SetMessage(true, "Registrer dine profiloplysninger for at kontakte elever", 10000, warning:true);
             }
         }
     }
