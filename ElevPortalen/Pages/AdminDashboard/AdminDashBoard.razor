@@ -287,7 +287,7 @@
                             }
                             else
                             {
-                                <h5 class="card-title fw-bold">No data recieved!</h5>
+                                _alertBox.SetMessage(true, "No data fund in database", 10000, warning:true);
                             }
                         </div>
                     </div>
@@ -306,8 +306,12 @@
 
 </AuthorizeView>
 
+<AlertBox @ref="_alertBox"></AlertBox>
+
 
 @code {
+    AlertBox _alertBox = new AlertBox();
+
     // List of studentmodel and companymodel
     private List<StudentModel> _listOfStudents = new List<StudentModel>();
     private List<CompanyModel> _listOfConpanies = new List<CompanyModel>();
@@ -351,6 +355,14 @@
     private async Task GetbySpeciality(string spec)
     {
         _listOfStudents = await _studentService.GetStudentsBySpecialization(spec);
+        if (!_listOfStudents.Any())
+        {
+            _alertBox.SetMessage(true, "There are no registered users with this specialty", 3000, warning: true);
+        }
+        else
+        {
+            isRegistrered = false;
+        }
     }
     #endregion
 
@@ -516,4 +528,5 @@
         await base.OnAfterRenderAsync(firstRender);
     }
     #endregion
+
 }
