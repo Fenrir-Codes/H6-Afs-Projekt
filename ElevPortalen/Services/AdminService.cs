@@ -1,4 +1,5 @@
 ﻿using ElevPortalen.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -11,15 +12,17 @@ namespace ElevPortalen.Services
         private readonly DataRecoveryDbContext _recoveryContext;
         private readonly ApplicationDbContext _LoginDbContext;
         private readonly JobOfferDbContext _jobOfferDbContext;
+        private readonly UserManager<IdentityUser> _userManager;
 
         #region constructor
         public AdminService(ElevPortalenDataDbContext DataDbcontext, DataRecoveryDbContext recoveryContext,
-            ApplicationDbContext loginDbContext, JobOfferDbContext jobOfferDbContext)
+            ApplicationDbContext loginDbContext, JobOfferDbContext jobOfferDbContext, UserManager<IdentityUser> userManager)
         {
             _DataDbcontext = DataDbcontext;
             _recoveryContext = recoveryContext;
             _LoginDbContext = loginDbContext;
             _jobOfferDbContext = jobOfferDbContext;
+            _userManager = userManager;
         }
         #endregion
 
@@ -30,6 +33,7 @@ namespace ElevPortalen.Services
         // Update  ( Company and student update are already working, I'll just note that they are created with a completely different method. )
         //Delete
         //Other functions
+
         #region Get registration date Student
         public async Task<Dictionary<string, double>> GetMonthlyRegistrationCountsStudent()
         {
