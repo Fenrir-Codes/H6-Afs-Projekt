@@ -4,6 +4,7 @@
 @using ElevPortalen.Pages.AlertBox
 @using ElevPortalen.Data;
 @using ElevPortalen.Pages.DialogModal
+@using ElevPortalen.Pages.SkeletonLoading
 @using ElevPortalen.Services;
 @using ElevPortalen.Models;
 @using Microsoft.AspNetCore.Components.Authorization
@@ -15,39 +16,41 @@
 @inject IJSRuntime jsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@foreach (var data in _company)
+@if (isVisible)
 {
-    <!--Social container on top-->
-    <div class="row mt-4">
-        <div class="col-lg-12">
-            <div class="card mb-4">
-                <div class="card-body shadow-sm">
-                    <div class="d-flex align-items-center">
-                       <p class=""></p>
+    @foreach (var data in _company)
+    {
+        <!--Social container on top-->
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-body shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <p class=""></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-body text-center shadow-sm">
-                    @if (!string.IsNullOrEmpty(data.profileImage) && ImageExistOnDisk(data.profileImage))
-                    {
-                        <img src="images/ProfileImages/@data.profileImage" alt="avatar"
-                             class="rounded-circle img-fluid" style="width: 150px;">
-                    }
-                    else
-                    {
-                        <img src="images/DefaultAvatar.jpg" alt="avatar"
-                             class="rounded-circle img-fluid" style="width: 150px;">
-                    }
-                    <h5 class="my-3">@data.CompanyName</h5>
-                    <p class="text-muted mb-3">@data.CompanyAddress</p>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center shadow-sm">
+                        @if (!string.IsNullOrEmpty(data.profileImage) && ImageExistOnDisk(data.profileImage))
+                        {
+                            <img src="images/ProfileImages/@data.profileImage" alt="avatar"
+                                 class="rounded-circle img-fluid" style="width: 150px;">
+                        }
+                        else
+                        {
+                            <img src="images/DefaultAvatar.jpg" alt="avatar"
+                                 class="rounded-circle img-fluid" style="width: 150px;">
+                        }
+                        <h5 class="my-3">@data.CompanyName</h5>
+                        <p class="text-muted mb-3">@data.CompanyAddress</p>
+                    </div>
                 </div>
-            </div>
             </div>
             <div class="col-lg-8">
                 <div class="card mb-4">
@@ -60,7 +63,7 @@
                                 <p class="text-muted mb-0">@data.RegisteredDate.ToShortDateString()</p>
                             </div>
                         </div>
-                        <hr />             
+                        <hr />
                         <div class="row">
                             <div class="col-sm-3">
                                 <p class="mb-0">Region</p>
@@ -92,18 +95,18 @@
                             </div>
                         </div>
                         <hr>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <p class="mb-0">Kontakt</p>
-                        </div>
-                        <div class="col-sm-9">
-                            <button class="btn btn-success mb-0 btn-sm" @onclick="() =>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Kontakt</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <button class="btn btn-success mb-0 btn-sm" @onclick="() =>
                                 DialogModal!.OpenMessageDialog(data.CompanyId, senderId, data.CompanyName, null)">
-                                Send besked
-                            </button>
+                                    Send besked
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <hr />
+                        <hr />
                         <div class="row">
                             <div class="col-sm-3">
                                 <p class="mb-0">Phone</p>
@@ -122,7 +125,7 @@
                                     @data.Preferences
                                 </p>
                             </div>
-                        </div>   
+                        </div>
                         <hr>
                         <div class="row">
                             <div class="col-sm-3">
@@ -164,21 +167,28 @@
             </div>
         </div>
 
-    @if (!string.IsNullOrEmpty(data.Description))
-    {
-        <!--Description-->
-        <div class="row">
-            <div class="col-lg-12">
-                @*   <p class="mb-2 fw-bold">Beskrivelse</p> *@
-                <div class="card mb-2">
-                    <div class="card-body shadow-sm">
-                        <p class="m-1">@data.Description</p>
+        @if (!string.IsNullOrEmpty(data.Description))
+        {
+            <!--Description-->
+            <div class="row">
+                <div class="col-lg-12">
+                    @*   <p class="mb-2 fw-bold">Beskrivelse</p> *@
+                    <div class="card mb-2">
+                        <div class="card-body shadow-sm">
+                            <p class="m-1">@data.Description</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
     }
 }
+else
+{
+    <ProfileSkeleton></ProfileSkeleton>
+}
+
+
 <DialogModal @ref="DialogModal" OnClose="ReRenderPage"></DialogModal>
 <AlertBox @ref="_alertBox" />
 
@@ -191,6 +201,7 @@
     public ClaimsPrincipal? _user { get; set; }
     private AuthenticationState? _authState;
     private int senderId = 0;
+    private bool isVisible = false;
 
 
     #region Oninitialize
@@ -242,9 +253,15 @@
         {
             _user = _authState.User;
             var student = await _studentService.ReadData(_user);
-            if (student != null)
+            if (student != null && student.Count > 0 && student[0].StudentId > 0)
             {
+                isVisible = true;
                 senderId = student[0].StudentId;
+            }
+            else
+            {
+                isVisible = false;
+                _alertBox.SetMessage(true, "Registrer dine profiloplysninger for at kontakte firmaer", 10000, warning: true);
             }
         }
     }

@@ -67,7 +67,7 @@
                                 </div>
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer;" @onclick="GetAllStudent">
-                                <div>View</div>
+                                <div>Vis</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer" @onclick="GetAllCompany">
-                                <div>View</div>
+                                <div>Vis</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
@@ -113,46 +113,41 @@
                             </div>
                             <div class="card-footer d-flex align-items-center justify-content-between small"
                                 @onclick="() => GetbySpeciality(selectedSpecialization)" style="cursor:pointer;">
-                                <div>View Filtered Results</div>
+                                <div>Vis Resultater</div>
                                 <div><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
-
-
-                    <!-- Fourth Card: Admin creation -->
-                    <!-- TODO placeholder text fades in the background -->
                     <div class="col-lg-6 col-xl-3 mb-2">
                         <div class="card bg-dark bg-gradient text-white h-100">
                             <div class="card-body">
-                                <div class="me-3">
-                                    <div class="text-white-75 small">
-                                        Opret ny Administrator
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="me-3">
+                                        <div class="text-white-75 small">
+                                            Registration
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="email" class="form-control" id="inputEmail" placeholder="Email" @bind="email" style="::placeholder { color: black; }" />
-                                    <label for="inputEmail" class="text-white">Email</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <input type="password" class="form-control" id="inputPassword" placeholder="Password" @bind="password" style="::placeholder { color: black; }" />
-                                    <label for="inputPassword" class="text-white">Password</label>
+                                    <i class="fa-solid fa-clock fa-2xl"></i>
                                 </div>
                             </div>
-                            <div class="card-footer d-flex align-items-center justify-content-between small" @onclick="CreateAdmin" style="cursor:pointer"> <!--TODO look into validating pword-->
-                                <div>Opret</div>
-                                <div><i class="fas fa-angle-right"></i></div>
+                            <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer" @onclick="GetRegistration">
+                                <div>Vis</div>
+                                <div href="#"><i class="fas fa-angle-right"></i></div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-
-
-                </div> <!--cards end-->
+                @if (isRegistrered)
+                {
+                    <div class="d-flex justify-content-center align-items-center">
+                    <LineChart @ref="lineChart" Width="800" Class="mb-4" />
+                    </div>
+                }
 
 
                 <!--More contect after the hr tag   , it can be a list of users etc...-->
-                @if (_listOfStudents.Any() || _listOfCompanies.Any())
+                @if (_listOfStudents.Any() || _listOfConpanies.Any())
                 {
                     <div class="card bg-dark bg-gradient text-white">
                         <div class="card-body">
@@ -170,7 +165,6 @@
                                             <th class="tableheader" scope="col">E-mail</th>
                                             <th class="tableheader" scope="col">Telefonnummer</th>
                                             <th class="tableheader" scope="col">Specialisering</th>
-                                            <th class="tableheader" scope="col">Verificeret</th>
                                             <th class="tableheader" scope="col">Operationer</th>
                                         </tr>
                                     </thead>
@@ -185,21 +179,13 @@
                                                 <td>@student.PhoneNumber</td>
                                                 <td>@student.Speciality</td>
                                                 <td>
-                                                    @if (student.IsVerified) {
-                                                        <span>Ja</span>
-                                                    } else {
-                                                        <span>Nej</span>
-                                                    }
-                                                </td>
-                                                <td>
                                                     <div class="btn-group">
-                                                        <button type="button" class="btn btn-operation dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Operation
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenStudentUpdate(student.StudentId)">Opdater</a></li>
-                                                            <li><a class="dropdown-item" href="#">Fjern</a></li>
-                                                            <li><a class="dropdown-item" @onclick="() => _adminService.VerifyStudent(student)">Verificer</a></li>
+                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenStudentUpdate(student.StudentId)" style="cursor:pointer">Opdater</a></li>
+                                                            <li><a class="dropdown-item" href="#" style="cursor:pointer">Fjern</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -221,7 +207,7 @@
                                 </nav>
 
                             }
-                            else if (_listOfCompanies.Any())
+                            else if (_listOfConpanies.Any())
                             {
                                 isCompany = true;
                                 <table class="table table-striped table-dark text-white">
@@ -272,12 +258,12 @@
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <button type="button" class="btn dropdown-toggle btn-operation" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Operation
                                                         </button>
                                                         <ul class="dropdown-menu">
-                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenCompanyUpdate(company.CompanyId)">Opdater</a></li>
-                                                            <li><a class="dropdown-item">Fjern</a></li>
+                                                            <li><a class="dropdown-item" @onclick="() => DialogModal!.OpenCompanyUpdate(company.CompanyId)" style="cursor:pointer">Opdater</a></li>
+                                                            <li><a class="dropdown-item" style="cursor:pointer">Fjern</a></li>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -301,7 +287,7 @@
                             }
                             else
                             {
-                                <h5 class="card-title fw-bold">No data recieved!</h5>
+                                _alertBox.SetMessage(true, "No data fund in database", 10000, warning:true);
                             }
                         </div>
                     </div>
@@ -320,11 +306,15 @@
 
 </AuthorizeView>
 
+<AlertBox @ref="_alertBox"></AlertBox>
+
 
 @code {
+    AlertBox _alertBox = new AlertBox();
+
     // List of studentmodel and companymodel
     private List<StudentModel> _listOfStudents = new List<StudentModel>();
-    private List<CompanyModel> _listOfCompanies = new List<CompanyModel>();
+    private List<CompanyModel> _listOfConpanies = new List<CompanyModel>();
 
     private string? selectedSpecialization;
 
@@ -345,11 +335,12 @@
     private bool isStudent = false;
     private bool isCompany = false;
     private bool isLoaded = false;
+    private bool isRegistrered = false;
 
-    //admin email / pass for creation
-    private string email;
-    private string password;
-
+    // Chart
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
 
     #region initialize
     protected override async Task OnInitializedAsync()
@@ -364,6 +355,14 @@
     private async Task GetbySpeciality(string spec)
     {
         _listOfStudents = await _studentService.GetStudentsBySpecialization(spec);
+        if (!_listOfStudents.Any())
+        {
+            _alertBox.SetMessage(true, "There are no registered users with this specialty", 3000, warning: true);
+        }
+        else
+        {
+            isRegistrered = false;
+        }
     }
     #endregion
 
@@ -381,8 +380,9 @@
     {
         isStudent = true;
         isCompany = false;
+        isRegistrered = false;
         _tableName = "Elever i Databasen";
-        _listOfCompanies.Clear();
+        _listOfConpanies.Clear();
         _listOfStudents = await _studentService.ReadAllStudentData();
         currentPage = 1;
     }
@@ -393,28 +393,12 @@
     {
         isCompany = true;
         isStudent = false;
+        isRegistrered = false;
         _tableName = "Firmaer i Databasen";
         _listOfStudents.Clear();
-        _listOfCompanies = await _companyService.ReadAllCompanyData();
+        _listOfConpanies = await _companyService.ReadAllCompanyData();
         currentPage = 1;
     }
-    #endregion
-
-    #region Create new admins
-
-    private async Task CreateAdmin() {
-        //check if email and password are not empty
-        if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(password)) {
-            await _adminService.CreateAdmin(email, password);
-            //clear the form fields after creating the admin
-            email = "";
-            password = "";
-        } else {
-            // Handle case where email or password is empty TODO
-
-        }
-    }
-
     #endregion
 
     #region Pagination Collections and change page function
@@ -426,8 +410,8 @@
 
     IEnumerable<CompanyModel> companiesToPage()
     {
-        TotalPagesCompanies = (int)Math.Ceiling((double)_listOfCompanies.Count / PageSize);
-        return _listOfCompanies.Skip((currentPage - 1) * PageSize).Take(PageSize);
+        TotalPagesCompanies = (int)Math.Ceiling((double)_listOfConpanies.Count / PageSize);
+        return _listOfConpanies.Skip((currentPage - 1) * PageSize).Take(PageSize);
     }
 
     // Pagination Change Page Function
@@ -456,6 +440,92 @@
             await GetAllCompany();
         }
         StateHasChanged();
+    }
+    #endregion
+
+    #region Chart of registration time
+    private async Task GetRegistration()
+    {
+        // Fetch data for students and companies
+        var studentRegistrationData = await _adminService.GetMonthlyRegistrationCountsStudent();
+        var companyRegistrationData = await _adminService.GetMonthlyRegistrationCountsCompany();
+
+        // Ensure we cover all months that either students or companies have registrations
+        var labels = studentRegistrationData.Keys.Union(companyRegistrationData.Keys).OrderBy(x => x).ToList();
+
+        // Convert the counts from the dictionaries into lists of doubles for the chart
+        var studentData = labels.Select(label => studentRegistrationData.ContainsKey(label) ? (double)studentRegistrationData[label] : 0).ToList();
+        var companyData = labels.Select(label => companyRegistrationData.ContainsKey(label) ? (double)companyRegistrationData[label] : 0).ToList();
+
+        var datasets = new List<IChartDataset>();
+
+        var datasetStudent = new LineChartDataset()
+            {
+                Label = "Lærlinge",
+                Data = studentData,
+                BackgroundColor = new List<string> { "#FF6384" },
+                BorderColor = new List<string> { "#FF6384" },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { "#FF6384" },
+                PointRadius = new List<int> { 3 },
+                PointHoverRadius = new List<int> { 4 },
+                Datalabels = new() { Align = "end", Anchor = "end" }
+            };
+        datasets.Add(datasetStudent);
+
+        var datasetsCompany = new LineChartDataset()
+            {
+                Label = "Firmaer",
+                Data = companyData,
+                BackgroundColor = new List<string> { "#36A2EB" },
+                BorderColor = new List<string> { "#36A2EB" },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { "#36A2EB" },
+                PointRadius = new List<int> { 3 },
+                PointHoverRadius = new List<int> { 4 },
+                Datalabels = new() { Align = "end", Anchor = "end" }
+            };
+        datasets.Add(datasetsCompany);
+
+        chartData = new ChartData
+            {
+                Labels = labels,
+                Datasets = datasets
+            };
+
+        lineChartOptions = new();
+        lineChartOptions.Responsive = true;
+        lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+
+        lineChartOptions.Scales.X!.Title!.Text = "Måneder";
+        lineChartOptions.Scales.X.Title.Display = true;
+
+        lineChartOptions.Scales.Y!.Title!.Text = "Registrerede";
+        lineChartOptions.Scales.Y.Title.Display = true;        
+                
+
+        lineChartOptions.Plugins.Title!.Text = "Månedlige Registrationer";
+        lineChartOptions.Plugins.Title.Display = true;
+
+        isLoaded = true;
+        isRegistrered = true;
+        isCompany = false;
+        isStudent = false;
+        _listOfStudents.Clear();
+        _listOfConpanies.Clear();
+        await InvokeAsync(StateHasChanged);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (isRegistrered)
+        {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
     #endregion
 

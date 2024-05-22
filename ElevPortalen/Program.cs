@@ -7,6 +7,7 @@ using ElevPortalen.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddBlazorBootstrap();
 
 //Services added by Jozsef
 builder.Services.AddScoped<AdminService>();
@@ -72,7 +74,19 @@ builder.Services.AddHttpClient();
 //Dataprotection service by Jozsef
 builder.Services.AddDataProtection();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureHttpsDefaults(options =>
+    {
+        // Grab the secret value from the secret store.
+        string? secretValue = builder.Configuration.GetValue<string>("CertificatePassword");
+        options.ServerCertificate = new X509Certificate2("elevportalen.pfx", secretValue);
+    });
+});
+
 // End ----
+
+
 
 var app = builder.Build();
 

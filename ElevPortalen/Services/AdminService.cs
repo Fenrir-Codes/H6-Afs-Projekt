@@ -1,7 +1,7 @@
 ﻿using ElevPortalen.Data;
-using ElevPortalen.Models;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace ElevPortalen.Services
 {
@@ -12,54 +12,19 @@ namespace ElevPortalen.Services
         private readonly DataRecoveryDbContext _recoveryContext;
         private readonly ApplicationDbContext _LoginDbContext;
         private readonly JobOfferDbContext _jobOfferDbContext;
-
         private readonly UserManager<IdentityUser> _userManager;
 
         #region constructor
         public AdminService(ElevPortalenDataDbContext DataDbcontext, DataRecoveryDbContext recoveryContext,
-            ApplicationDbContext loginDbContext, JobOfferDbContext jobOfferDbContext,
-            UserManager<IdentityUser> userManager)
+            ApplicationDbContext loginDbContext, JobOfferDbContext jobOfferDbContext, UserManager<IdentityUser> userManager)
         {
             _DataDbcontext = DataDbcontext;
             _recoveryContext = recoveryContext;
             _LoginDbContext = loginDbContext;
             _jobOfferDbContext = jobOfferDbContext;
-
             _userManager = userManager;
-
         }
         #endregion
-
-        // CreateAdmin function to create a new admin user
-        public async Task<(bool success, string message)> CreateAdmin(string email, string password) {
-            var adminUser = new IdentityUser { UserName = email, Email = email };
-
-            var result = await _userManager.CreateAsync(adminUser, password);
-            if (result.Succeeded) {
-                await _userManager.AddToRoleAsync(adminUser, "Admin");
-                return (true, "Admin user created.");
-            } else {
-                // Handle creation failure, such as displaying errors
-                return (false, "Failed to create admin user.");
-            }
-        }
-
-        // VerifyStudent method to verify students:
-        public async Task<(bool success, string message)> VerifyStudent(StudentModel student) {
-            try {
-                // Update the IsVerified property of the student
-                student.IsVerified = true;
-
-                // Update the entity in the context and save changes
-                _DataDbcontext.Update(student);
-                await _DataDbcontext.SaveChangesAsync();
-
-                return (true, "Student verified successfully.");
-            } catch (Exception ex) {
-                return (false, $"An error occurred while verifying the student: {ex.Message}");
-            }
-        }
-
 
         // Name the functions as you like, and add more if needed.  service is integrated allready in program cs
 
@@ -69,6 +34,47 @@ namespace ElevPortalen.Services
         //Delete
         //Other functions
 
+        #region Get registration date Student
+        public async Task<Dictionary<string, double>> GetMonthlyRegistrationCountsStudent()
+        {
+            var monthlyCounts = await _DataDbcontext.Student
+                .GroupBy(s => new { s.RegisteredDate.Year, s.RegisteredDate.Month })
+                .Select(g => new
+                {
+                    Month = g.Key.Month,
+                    Year = g.Key.Year,
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Year).ThenBy(x => x.Month)
+                .ToListAsync();
+
+            // Convert month number to month name
+            var monthNames = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.MonthNames;
+            return monthlyCounts.ToDictionary(x => monthNames[x.Month - 1] + " " + x.Year, x => (double)x.Count);
+        }
+
+        #endregion
+
+        #region Get registration date Company
+        public async Task<Dictionary<string, double>> GetMonthlyRegistrationCountsCompany()
+        {
+            var monthlyCounts = await _DataDbcontext.Company
+                .GroupBy(s => new { s.RegisteredDate.Year, s.RegisteredDate.Month })
+                .Select(g => new
+                {
+                    Month = g.Key.Month,
+                    Year = g.Key.Year,
+                    Count = g.Count()
+                })
+                .OrderBy(x => x.Year).ThenBy(x => x.Month)
+                .ToListAsync();
+
+            // Convert month number to month name
+            var monthNames = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.MonthNames;
+            return monthlyCounts.ToDictionary(x => monthNames[x.Month - 1] + " " + x.Year, x => (double)x.Count);
+        }
+
+        #endregion
 
     }
 }
