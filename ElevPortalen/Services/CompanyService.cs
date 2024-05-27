@@ -183,11 +183,11 @@ namespace ElevPortalen.Services
                     _context.Company.Remove(company);
                     await _context.SaveChangesAsync();
 
-                    return ("The Profile deleted Successfully.", true);
+                    return ("The Company Profile was deleted Successfully.", true);
                 }
                 else
                 {
-                    return ("Student not found.", false);
+                    return ("Company not found.", false);
                 }
             }
             catch (Exception ex)
