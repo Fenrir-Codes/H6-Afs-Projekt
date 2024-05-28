@@ -43,7 +43,7 @@ options.SignIn.RequireConfirmedAccount = false)
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    // Password settings to min 6 char and require Uppercase, unique char, and digit.
+    //Password settings to min 6 char and require Uppercase, unique char, and digit.
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = true;
