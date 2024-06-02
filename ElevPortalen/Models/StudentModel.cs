@@ -38,7 +38,6 @@ namespace ElevPortalen.Models
         public string? InstagramLink { get; set; }
         [Url]
         public string? GitHubLink { get; set; }
-        public bool IsVerified { get; set; }
         [Required]
         public DateTime RegisteredDate { get; set; }
         [Required]
