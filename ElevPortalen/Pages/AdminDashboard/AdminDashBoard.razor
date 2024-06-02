@@ -8,6 +8,7 @@
 @using ElevPortalen.Models;
 @using ElevPortalen.Pages.AlertBox
 @using System.Security.Cryptography;
+@using System.Globalization
 
 @inject ElevPortalenDataDbContext _context
 @inject StudentService _studentService
@@ -450,12 +451,35 @@
         var studentRegistrationData = await _adminService.GetMonthlyRegistrationCountsStudent();
         var companyRegistrationData = await _adminService.GetMonthlyRegistrationCountsCompany();
 
-        // Ensure we cover all months that either students or companies have registrations
-        var labels = studentRegistrationData.Keys.Union(companyRegistrationData.Keys).OrderBy(x => x).ToList();
+        // Parse and sort labels
+        var cultureInfo = new CultureInfo("da-DK");
+        var labels = studentRegistrationData.Keys
+            .Union(companyRegistrationData.Keys)
+            .Select(dateStr => DateTime.ParseExact(dateStr, "MMMM yyyy", cultureInfo)) // Parse using Danish culture
+            .OrderBy(date => date)
+            .Select(date => date.ToString("MMMM yyyy", cultureInfo)) // Convert back to Danish month-year format
+            .ToList();
+
+        Console.WriteLine("Sorted Labels:");
+        foreach (var label in labels)
+        {
+            Console.WriteLine(label);
+        }
 
         // Convert the counts from the dictionaries into lists of doubles for the chart
-        var studentData = labels.Select(label => studentRegistrationData.ContainsKey(label) ? (double)studentRegistrationData[label] : 0).ToList();
-        var companyData = labels.Select(label => companyRegistrationData.ContainsKey(label) ? (double)companyRegistrationData[label] : 0).ToList();
+        var studentData = labels.Select(label =>
+            {
+                var key = DateTime.ParseExact(label, "MMMM yyyy", cultureInfo).ToString("MMMM yyyy");
+                return studentRegistrationData.ContainsKey(key) ? (double)studentRegistrationData[key] : 0;
+            })
+            .ToList();
+
+        var companyData = labels.Select(label =>
+            {
+                var key = DateTime.ParseExact(label, "MMMM yyyy", cultureInfo).ToString("MMMM yyyy");
+                return companyRegistrationData.ContainsKey(key) ? (double)companyRegistrationData[key] : 0;
+            })
+            .ToList();
 
         var datasets = new List<IChartDataset>();
 
