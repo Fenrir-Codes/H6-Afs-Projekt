@@ -120,21 +120,27 @@ async Task CheckRolesExisting(WebApplication app)
 #region Create Master Admin account if no master admin account exists
 //Open userSecrets on the ElevPortalen project, manage user secrets, add to secrets: "AdminPassword": "Admin.PassW0rd"
 //Creates an admin with mail: admin@example.com and password: Admin.PassW0rd
-async Task CreateAdmin(WebApplication app) {
-    using (var scope = app.Services.CreateScope()) {
+async Task CreateAdmin(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
         var adminEmail = "admin@example.com";
         var adminPassword = builder.Configuration["AdminPassword"];
 
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
 
-        if (existingAdmin == null) {
+        if (existingAdmin == null)
+        {
             var adminUser = new IdentityUser { UserName = adminEmail, Email = adminEmail };
             var result = await userManager.CreateAsync(adminUser, adminPassword);
 
-            if (result.Succeeded) {
+            if (result.Succeeded)
+            {
                 await userManager.AddToRoleAsync(adminUser, "Admin");
-            } else {
+            }
+            else
+            {
                 //handle error creating admin user
                 Console.WriteLine("Error creating admin user. Admin user was not created.");
             }
