@@ -5,7 +5,7 @@ using System.Data;
 
 namespace ElevPortalen.Services
 {
-    public class AdminService
+    public class AdminService : IAdminService
     {
         // Dsatabase Contexts
         private readonly ElevPortalenDataDbContext _DataDbcontext;
@@ -75,6 +75,15 @@ namespace ElevPortalen.Services
         }
 
         #endregion
+
+    }
+
+    public interface IAdminService {
+
+        Task<Dictionary<string, double>> GetMonthlyRegistrationCountsStudent();
+
+        Task<Dictionary<string, double>> GetMonthlyRegistrationCountsCompany();
+
 
     }
 }

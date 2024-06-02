@@ -10,7 +10,7 @@ namespace ElevPortalen.Services
     /// <summary>
     ///  Lavet af Jozsef
     /// </summary>
-    public class CompanyService
+    public class CompanyService : ICompanyService
     {
         private readonly ElevPortalenDataDbContext _context;
         private readonly DataRecoveryDbContext _recoveryContext;
@@ -392,6 +392,29 @@ namespace ElevPortalen.Services
             }
         }
         #endregion
+
+    }
+
+    //Interface for test purposes
+    public interface ICompanyService {
+        Task<(string?, bool)> CreateCompany(CompanyModel company);
+        Task<List<CompanyModel>> ReadData(ClaimsPrincipal _user);
+        Task<List<CompanyModel>> ReadAllVisibleCompanyData();
+        Task<List<CompanyModel>> ReadAllCompanyData();
+        Task<(string, bool)> Update(CompanyModel company);
+        Task<(string, bool)> Delete(int companytId);
+        Task<CompanyModel> GetCompanyById(int companyId);
+        Task<List<CompanyModel>> GetCompanyByIdToList(int Id);
+        Task<int> GetCompaniesCountAsync();
+        Task<string> CreateRecoveryData(CompanyModel deletedCompany);
+        Task<bool> CheckRecoveryDataExist(Guid id);
+        Task<(string, bool)> RecoverCompanyData(Guid id);
+        Task<CompanyModel?> GetCompanyByGuid(Guid id);
+
+
+
+
+
 
     }
 }

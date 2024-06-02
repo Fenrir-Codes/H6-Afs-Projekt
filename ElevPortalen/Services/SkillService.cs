@@ -8,7 +8,7 @@ namespace ElevPortalen.Services
     /// <summary>
     ///  Lavet af Jozsef
     /// </summary>
-    public class SkillService
+    public class SkillService : ISkillService
     {
         private readonly ElevPortalenDataDbContext _context;
         private readonly IDataProtector? _dataProtector;
@@ -40,7 +40,7 @@ namespace ElevPortalen.Services
         }
         #endregion
 
-        #region Getting the skill Name as string to List
+        #region Getting the skill Name by Id as string to List
         public async Task<List<string>> GetSkillsById(int id)
         {
             var skilldata = await _context.StudentSkills.FirstOrDefaultAsync(s => s.StudentId == id);
@@ -209,5 +209,19 @@ namespace ElevPortalen.Services
         }
 
         #endregion
+    }
+
+    public interface ISkillService {
+
+        Task<List<string>> GetSkills(StudentModel data);
+        Task<List<string>> GetSkillsById(int id);
+        Task<(string?, bool)> CreateSkills(int studentId, SkillModel newSkills);
+        Task<(string?, SkillModel?)> GetSkillsByStudentId(int studentId);
+        Task<(string?, bool)> UpdateSkills(int studentId, SkillModel updatedSkills);
+        Task<(bool, string?)> DeleteSkills(int studentId);
+
+
+
+
     }
 }
