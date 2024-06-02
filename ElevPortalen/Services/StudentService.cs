@@ -10,7 +10,7 @@ namespace ElevPortalen.Services
     /// <summary>
     ///  Lavet af Jozsef
     /// </summary>
-    public class StudentService
+    public class StudentService : IStudentService
     {
         private readonly ElevPortalenDataDbContext _context;
         private readonly DataRecoveryDbContext _recoveryContext;
@@ -403,6 +403,23 @@ namespace ElevPortalen.Services
             }
         }
         #endregion
+
+    }
+
+    public interface IStudentService {
+        Task<(string?, bool)> CreateStudent(StudentModel student);
+        Task<List<StudentModel>> ReadData(ClaimsPrincipal _user);
+        Task<List<StudentModel>> ReadAllStudentData();
+        Task<int> GetStudentCountAsync();
+        Task<(string, bool)> Update(StudentModel student);
+        Task<string> Delete(int studentId);
+        Task<StudentModel> GetStudentById(int Id);
+        Task<List<StudentModel>> GetStudentByIdToList(int Id);
+        Task<StudentModel?> GetStudentByGuid(Guid id);
+        Task<List<StudentModel>> GetStudentsBySpecialization(string specialization);
+        Task<string> CreateRecoveryData(StudentModel deletedStudent);
+        Task<bool> CheckRecoveryDataExist(Guid id);
+        Task<string> RecoverStudentData(Guid id);
 
     }
 }

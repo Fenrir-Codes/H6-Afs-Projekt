@@ -10,7 +10,7 @@ namespace ElevPortalen.Services
     /// <summary>
     ///  Lavet af Jozsef
     /// </summary>
-    public class CompanyService
+    public class CompanyService : ICompanyService
     {
         private readonly ElevPortalenDataDbContext _context;
         private readonly DataRecoveryDbContext _recoveryContext;
@@ -79,7 +79,7 @@ namespace ElevPortalen.Services
         }
         #endregion
 
-        #region Get All Data from Company if their profile is set to visible
+        #region Get All Data from Company 
         public async Task<List<CompanyModel>> ReadAllCompanyData()
         {
             try
@@ -183,11 +183,11 @@ namespace ElevPortalen.Services
                     _context.Company.Remove(company);
                     await _context.SaveChangesAsync();
 
-                    return ("The Profile deleted Successfully.", true);
+                    return ("The Company Profile was deleted Successfully.", true);
                 }
                 else
                 {
-                    return ("Student not found.", false);
+                    return ("Company not found.", false);
                 }
             }
             catch (Exception ex)
@@ -392,6 +392,29 @@ namespace ElevPortalen.Services
             }
         }
         #endregion
+
+    }
+
+    //Interface for test purposes
+    public interface ICompanyService {
+        Task<(string?, bool)> CreateCompany(CompanyModel company);
+        Task<List<CompanyModel>> ReadData(ClaimsPrincipal _user);
+        Task<List<CompanyModel>> ReadAllVisibleCompanyData();
+        Task<List<CompanyModel>> ReadAllCompanyData();
+        Task<(string, bool)> Update(CompanyModel company);
+        Task<(string, bool)> Delete(int companytId);
+        Task<CompanyModel> GetCompanyById(int companyId);
+        Task<List<CompanyModel>> GetCompanyByIdToList(int Id);
+        Task<int> GetCompaniesCountAsync();
+        Task<string> CreateRecoveryData(CompanyModel deletedCompany);
+        Task<bool> CheckRecoveryDataExist(Guid id);
+        Task<(string, bool)> RecoverCompanyData(Guid id);
+        Task<CompanyModel?> GetCompanyByGuid(Guid id);
+
+
+
+
+
 
     }
 }
