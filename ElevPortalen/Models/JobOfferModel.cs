@@ -20,7 +20,7 @@ namespace ElevPortalen.Models
         public string? JobAddress { get; set; }
         [Url]
         public string? JobLink { get; set; }
-        [Column(TypeName = "nvarchar(2000)")]
+        [Column(TypeName = "nvarchar(max)")]
         public string? JobDetails { get; set; }
         public int NumberOfPositionsAvailable { get; set; }
         [Column(TypeName = "nvarchar(100)")]

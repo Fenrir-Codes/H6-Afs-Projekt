@@ -458,6 +458,7 @@
         var companyRegistrationData = await _adminService.GetMonthlyRegistrationCountsCompany();
 
         // Parse and sort labels
+        // var cultureInfo = new CultureInfo("hu-HU");
         var cultureInfo = new CultureInfo("da-DK");
         var labels = studentRegistrationData.Keys
             .Union(companyRegistrationData.Keys)

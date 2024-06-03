@@ -115,7 +115,6 @@ namespace ElevPortalen.Services
         }
         #endregion
 
-
         #region Update Job Offer
         public async Task<(string, bool)> Update(JobOfferModel job)
         {
@@ -166,7 +165,7 @@ namespace ElevPortalen.Services
 
         #region Helper method to check if two  entities are equal
         private bool AreEntitiesEqual(JobOfferModel entry, JobOfferModel jobtoUpdate)
-        {
+        { //test note: private methods are not tested
             return entry.Title == jobtoUpdate.Title &&
                 entry.ContactPerson == jobtoUpdate.ContactPerson &&
                 entry.PhoneNumber == jobtoUpdate.PhoneNumber &&

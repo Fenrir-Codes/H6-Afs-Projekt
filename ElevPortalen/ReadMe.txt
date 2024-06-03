@@ -136,3 +136,14 @@ program.cs file changes :
      update-database -context DataRecoveryDbContext
 
      update-database -context JobOfferDbContext
+
+
+
+
+     Droppind databases : 
+
+     drop-database -context ApplicationDbContext
+
+
+     IMPORTANT IF NOTHING WORKS
+     Remove Appsettings.Development.Json file
