@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElevPortalen", "ElevPortale
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A66CC9B3-1B77-4E34-97A3-FFD1576C5B26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevPortalenTests", "ElevPortalenTests\ElevPortalenTests.csproj", "{B0E4EB74-9F61-4EA4-B896-D37D2305E5ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElevPortalenTests", "ElevPortalenTests\ElevPortalenTests.csproj", "{B0E4EB74-9F61-4EA4-B896-D37D2305E5ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

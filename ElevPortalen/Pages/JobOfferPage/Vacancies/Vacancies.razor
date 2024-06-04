@@ -11,7 +11,7 @@
 
 <div class="container-fluid">
     <div class="row d-flex justify-content-center">
-        @if (!isLoaded)
+        @if (!isLoaded || !_jobList.Any())
         {
             <!-- Placeholder skeleton for card -->
             @for (int i = 0; i < 5; i++)
@@ -29,10 +29,6 @@
                     </div>
                 </div>
             }
-        }
-        else if (!_jobList.Any())
-        {
-            _alertBox.SetMessage(true, "Der er endnu ikke oprettet jobtilbud", 0, warning: true);
         }
         else
         {
@@ -82,11 +78,16 @@
         var (list, message, success) = await _jobService.GetAllOffers();
         if (success)
         {
-            isLoaded = success;
+            isLoaded = true;
             _jobList = list;
+
+            if (!_jobList.Any())
+            {
+                _alertBox.SetMessage(true, "Der er endnu ikke oprettet jobtilbud", 0, warning: true);
+            }
         }
         else
-        {
+        {      
             _alertBox.SetMessage(true, message, 10000, warning:true);
         }
     }
