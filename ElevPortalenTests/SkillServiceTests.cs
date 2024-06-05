@@ -276,7 +276,7 @@ namespace ElevPortalenTests {
 
         #region Create Skills test2 - CreateSkills should overwrite existing skills for a student
         [Fact]
-        public async Task CreateSkills_ShouldProbablyNotUpdateExistingSkills_WhenStudentHasSkills() {
+        public async Task CreateSkills_ShouldNotUpdateExistingSkills_WhenStudentHasSkills() {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var studentId = 1;
