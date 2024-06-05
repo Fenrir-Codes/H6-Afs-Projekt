@@ -7,6 +7,7 @@
 @using ElevPortalen.Data;
 @using System.Text.Json
 @using System.Threading
+@using System.Text
 
 @inject DawaService dawaService
 @inject ElevPortalenDataDbContext _context
@@ -403,6 +404,10 @@
     private bool isAuthenticated = false;
 
     private CancellationTokenSource? cancellationTokenSource;
+
+    //Used for generate random ID's
+    private static readonly Random random = new Random();
+
     #endregion
 
     #region OnInitialize
@@ -422,6 +427,13 @@
                 isAuthenticated = false;
             }
         }
+    }
+    #endregion
+
+    #region Generator for rundom ID numbers for senderID and recieverId
+    public int GenerateRandomIdForUser()
+    {
+        return random.Next(100000000, 1000000000); // Generate a 9-digit number (Ex:123456789)
     }
     #endregion
 
@@ -447,6 +459,8 @@
                         _studentData = new StudentModel
                             {
                                 UserId = userId, // Set the UserId to the user's unique identifier
+                                senderId = GenerateRandomIdForUser(),
+                                receiverId = GenerateRandomIdForUser(),
                                 Title = _studentData.Title,
                                 FirstName = _studentData.FirstName,
                                 MiddleName = _studentData.MiddleName,
@@ -534,6 +548,8 @@
                         _companyData = new CompanyModel
                             {
                                 UserId = userId,
+                                senderId = GenerateRandomIdForUser(),
+                                receiverId = GenerateRandomIdForUser(),
                                 CompanyName = _companyData.CompanyName,
                                 CompanyAddress = _companyData.CompanyAddress,
                                 Region = _companyData.Region,

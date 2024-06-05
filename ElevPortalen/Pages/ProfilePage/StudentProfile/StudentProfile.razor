@@ -68,7 +68,7 @@ else
                                             </span>
                                         </a>
                                     }
-                                    <button type="button" class="btn btn-outline-success position-relative btn-sm" @onclick="() => NavigateToMyMessages(data.StudentId)">
+                                    <button type="button" class="btn btn-outline-success position-relative btn-sm" @onclick="() => NavigateToMyMessages(data.receiverId)">
                                         Inbox 
                                         <span><i class="fa-solid fa-envelope"></i></span>
                                         @if (unreadMessages > 0)
@@ -538,7 +538,7 @@ else
                 await GetSkills(_student);
 
                 // Count the unread messages
-                await GetUnreadMessagesCount(_student[0].StudentId);
+                await GetUnreadMessagesCount(_student[0].receiverId);
             }
             else if (!_student.Any() || _student == null)
             {

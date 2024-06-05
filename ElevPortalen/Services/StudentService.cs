@@ -307,6 +307,8 @@ namespace ElevPortalen.Services
                 {
                     UserId = deletedStudent.UserId,
                     StudentId = deletedStudent.StudentId,
+                    senderId = deletedStudent.senderId,
+                    receiverId = deletedStudent.receiverId,
                     Title = deletedStudent.Title,
                     FirstName = deletedStudent.FirstName,
                     MiddleName = deletedStudent.MiddleName,
@@ -406,7 +408,8 @@ namespace ElevPortalen.Services
 
     }
 
-    public interface IStudentService {
+    public interface IStudentService
+    {
         Task<(string?, bool)> CreateStudent(StudentModel student);
         Task<List<StudentModel>> ReadData(ClaimsPrincipal _user);
         Task<List<StudentModel>> ReadAllStudentData();

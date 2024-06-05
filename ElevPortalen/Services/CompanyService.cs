@@ -271,6 +271,8 @@ namespace ElevPortalen.Services
                 {
                     UserId = deletedCompany.UserId,
                     CompanyId = deletedCompany.CompanyId,
+                    senderId = deletedCompany.senderId,
+                    receiverId = deletedCompany.receiverId,
                     CompanyName = deletedCompany.CompanyName,
                     CompanyAddress = deletedCompany.CompanyAddress,
                     Region = deletedCompany.Region,
@@ -328,6 +330,8 @@ namespace ElevPortalen.Services
                     var recoveredCompany = new CompanyModel
                     {
                         UserId = recoveryData.UserId,
+                        senderId = recoveryData.senderId,
+                        receiverId = recoveryData.receiverId,
                         CompanyName = recoveryData.CompanyName,
                         CompanyAddress = recoveryData.CompanyAddress,
                         Region = recoveryData.Region,
@@ -396,7 +400,8 @@ namespace ElevPortalen.Services
     }
 
     //Interface for test purposes
-    public interface ICompanyService {
+    public interface ICompanyService
+    {
         Task<(string?, bool)> CreateCompany(CompanyModel company);
         Task<List<CompanyModel>> ReadData(ClaimsPrincipal _user);
         Task<List<CompanyModel>> ReadAllVisibleCompanyData();

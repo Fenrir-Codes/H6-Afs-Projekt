@@ -101,7 +101,7 @@
                             </div>
                             <div class="col-sm-9">
                                 <button class="btn btn-success mb-0 btn-sm" @onclick="() =>
-                                DialogModal!.OpenMessageDialog(data.CompanyId, senderId, data.CompanyName, null)">
+                                DialogModal!.OpenMessageDialog(data.receiverId, senderId, data.CompanyName, null)">
                                     Send besked
                                 </button>
                             </div>
@@ -256,7 +256,7 @@ else
             if (student != null && student.Count > 0 && student[0].StudentId > 0)
             {
                 isVisible = true;
-                senderId = student[0].StudentId;
+                senderId = student[0].senderId;
             }
             else
             {

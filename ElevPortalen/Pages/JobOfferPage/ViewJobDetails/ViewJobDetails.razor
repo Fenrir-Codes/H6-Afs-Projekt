@@ -46,7 +46,7 @@
                             <button class="btn btn-sm btn-success me-2" @onclick="() => NavigateToNewTab(_job.JobLink)">Ansøg via link</button>
                         }
                         <button class="btn btn-sm btn-success" @onclick="() =>
-                                DialogModal!.OpenMessageDialog(_job.CompanyId, senderId, _job.CompanyName, null)">
+                                DialogModal!.OpenMessageDialog(_job.receiverId, senderId, _job.CompanyName, null)">
                             Send besked
                         </button>
                     </div>
@@ -208,14 +208,14 @@
             }
             else
             {
-                senderId = student[0].StudentId;
+                senderId = student[0].senderId;
             }
         }
         else
         {
             isVisible = false;
             columnWidth = "col-lg-12";
-            _message = "For at se yderligere jobdetaljer skal du logge ind.";
+            _message = "";
         }
     }
     #endregion
