@@ -74,6 +74,12 @@ builder.Services.AddHttpClient();
 //Dataprotection service by Jozsef
 builder.Services.AddDataProtection();
 
+
+//var apiKey = builder.Configuration["ChatApiKey"];
+//builder.Services.AddScoped(sp => new ChatService(new HttpClient(), apiKey!));
+
+
+//Kestrel cert
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ConfigureHttpsDefaults(options =>
@@ -85,8 +91,6 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 // End ----
-
-
 
 var app = builder.Build();
 

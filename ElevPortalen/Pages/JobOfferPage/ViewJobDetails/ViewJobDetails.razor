@@ -196,10 +196,17 @@
             isVisible = true;
             columnWidth = "col-lg-8";
             _message = "For at søge dette job skal du logge ind";
-            
+
             _user = _authState.User;
             var student = await _studentService.ReadData(_user);
-            if (student != null)
+
+            if (student.Count <= 0)
+            {
+                isVisible = false;
+                columnWidth = "col-lg-12";
+                _message = "For at se yderligere jobdetaljer skal du først registrere din personlige profil.";
+            }
+            else
             {
                 senderId = student[0].StudentId;
             }
@@ -208,7 +215,7 @@
         {
             isVisible = false;
             columnWidth = "col-lg-12";
-            _message = "";
+            _message = "For at se yderligere jobdetaljer skal du logge ind.";
         }
     }
     #endregion
