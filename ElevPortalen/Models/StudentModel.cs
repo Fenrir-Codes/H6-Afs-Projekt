@@ -10,6 +10,8 @@ namespace ElevPortalen.Models
 
         [Key]
         public int StudentId { get; set; }
+        public int senderId { get; set; }
+        public int receiverId { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         public string? Title { get; set; } // jeg tror vi skal ikke have title bruger vi specialisering i stedet for
         [Column(TypeName = "nvarchar(100)")]

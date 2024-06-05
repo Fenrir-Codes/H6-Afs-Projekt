@@ -10,6 +10,8 @@ namespace ElevPortalen.Models
         [Key]
         public int HistoryId { get; set; }
         public int CompanyId { get; set; }
+        public int senderId { get; set; }
+        public int receiverId { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         public string? CompanyName { get; set; }
         [Column(TypeName = "nvarchar(100)")]
@@ -33,6 +35,6 @@ namespace ElevPortalen.Models
         [Required]
         public DateTime RegisteredDate { get; set; }
         [Required]
-        public DateTime RecoveryCreatedDate{ get; set; }
+        public DateTime RecoveryCreatedDate { get; set; }
     }
 }

@@ -274,11 +274,13 @@
     #endregion
 
     #region open Job Offer Dialog
-    public void OpenJobOfferDialog(int companyId, string? companyName)
+    public void OpenJobOfferDialog(int companyId, int senderId, int recieverId, string? companyName)
     {
         jobDialogHeaderText = "Opret Jobtilbud";
         JobOfferDialog = true;
         _job.CompanyId = companyId;
+        _job.senderId = senderId;
+        _job.receiverId = recieverId;
         _job.CompanyName = companyName;
 
         DisplayStyle = "block;";
