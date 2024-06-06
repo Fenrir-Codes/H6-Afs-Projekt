@@ -796,7 +796,7 @@ namespace ElevPortalenTests {
             Assert.Equal("Company Recovery Created", result);
             // Query the recovery database to check if a company with the name "TestCompany" exists
             var recoveredCompany = await _dataRecoveryContext.CompanyDataRecovery.FirstOrDefaultAsync(c => c.CompanyName == "TestCompany");
-            Assert.NotNull(recoveredCompany); // Ensure that the company exists in the recovery database
+            Assert.NotNull(recoveredCompany); // Ensure that the company exists in the recovery database        
 
         }
 
