@@ -15,7 +15,15 @@ For run this application without errors:
 
 
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+User secrets:
+{
+  "CertificatePassword": "SecretPassw0rd#",
+  "AdminPassword": "Admin.PassW0rd",
+  "ChatApiKey": "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"
+}
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 Make certificate (self signed):
 
 1 - make a folder named "temp" on the root of the c: drive
