@@ -140,7 +140,7 @@ program.cs file changes :
 
 
 
-     Droppind databases : 
+     Dropping databases : 
 
      drop-database -context ApplicationDbContext
 
