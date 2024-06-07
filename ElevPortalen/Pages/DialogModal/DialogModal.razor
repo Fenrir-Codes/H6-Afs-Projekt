@@ -28,7 +28,7 @@
                 }
                 else if (MessageDialog)
                 {
-                    <MessageDialog Model="_messageToSend" MessageTo="@_messageTo" ReceiverId="@_recieverId" SenderId="@_sendererId"></MessageDialog>
+                    <MessageDialog Model="_messageToSend" MessageTo="@_messageTo" ReceiverId="@_recieverId" SenderId="@_senderId" sendersReceiverId="@_sendersReceiverId"></MessageDialog>
                 }
                 else if (JobOfferDialog)
                 {
@@ -84,7 +84,6 @@
 
     #region Initialize parameter and fields , models
     [Parameter] public EventCallback<bool> OnClose { get; set; }
-
     public StudentModel _studentToUpdate = new StudentModel();
     private CompanyModel _companyToUpdate = new CompanyModel();
     private MessageModel _messageToSend = new MessageModel();
@@ -108,7 +107,8 @@
 
     private string? _messageTo { get; set; }
     private int _recieverId { get; set; }
-    private int _sendererId { get; set; }
+    private int _senderId { get; set; }
+    private int _sendersReceiverId { get; set; }
     // sent it to job offer dialog
     private int _companyId { get; set; }
 
@@ -244,11 +244,12 @@
     #endregion
 
     #region Message Dialog
-    public void OpenMessageDialog(int recieverId, int senderId, string? firstName, string? lastName)
+    public void OpenMessageDialog(int recieverId, int senderId, int sendersRecieverId, string? firstName, string? lastName)
     {
         MessageDialog = true;
         _recieverId = recieverId;
-        _sendererId = senderId;
+        _senderId = senderId;
+        _sendersReceiverId = sendersRecieverId;
         _messageTo = firstName + " " + lastName;
 
         DisplayStyle = "block;";
@@ -258,11 +259,12 @@
     #endregion
 
     #region Message Dialog
-    public void OpenAnswareDialog(int senderId, int recieverId, string? firstName, string? lastName,string? subject, string? content)
+    public void OpenAnswareDialog(int recieverId, int senderId, int senderReceiverId, string? firstName, string? lastName, string? subject, string? content)
     {
         MessageDialog = true;
-        _recieverId = senderId;
-        _sendererId = recieverId;
+        _recieverId = recieverId;
+        _senderId = senderId;
+        _sendersReceiverId = senderReceiverId;
         _messageTo = firstName + " " + lastName;
         _messageToSend.SenderName = firstName + lastName;
         _messageToSend.Subject = "Re: " + subject;

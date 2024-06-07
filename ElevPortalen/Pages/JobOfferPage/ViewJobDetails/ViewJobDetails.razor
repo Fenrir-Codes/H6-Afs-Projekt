@@ -46,7 +46,7 @@
                             <button class="btn btn-sm btn-success me-2" @onclick="() => NavigateToNewTab(_job.JobLink)">Ansøg via link</button>
                         }
                         <button class="btn btn-sm btn-success" @onclick="() =>
-                                DialogModal!.OpenMessageDialog(_job.receiverId, senderId, _job.CompanyName, null)">
+                                DialogModal!.OpenMessageDialog(_job.receiverId, senderId, sendersRecieverId, _job.CompanyName, null)">
                             Send besked
                         </button>
                     </div>
@@ -180,6 +180,7 @@
     private string columnWidth = "col-lg-12";
     private string _message = "";
     private int senderId = 0;
+    private int sendersRecieverId = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -209,6 +210,7 @@
             else
             {
                 senderId = student[0].senderId;
+                sendersRecieverId = student[0].receiverId;
             }
         }
         else

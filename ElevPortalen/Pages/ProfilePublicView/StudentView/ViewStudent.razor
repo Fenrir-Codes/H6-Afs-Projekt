@@ -156,7 +156,7 @@
                             </div>
                             <div class="col-sm-9">
                                 <button class="btn btn-success mb-0 btn-sm" @onclick="() =>
-                                 DialogModal!.OpenMessageDialog(data.receiverId, senderId, data.FirstName, data.LastName)">
+                                 DialogModal!.OpenMessageDialog(data.receiverId, senderId, sendersRecieverId, data.FirstName, data.LastName)">
                                     Send besked
                                 </button>
                             </div>
@@ -231,6 +231,7 @@ else
     private AuthenticationState? _authState;
     private string Message = "";
     private int senderId = 0;
+    private int sendersRecieverId = 0;
 
     private List<StudentModel> _student = new List<StudentModel>();
     private List<string> _SkillsOfStudent = new List<string>();
@@ -303,6 +304,7 @@ else
             {
                 isVisible = true;
                 senderId = company[0].senderId;
+                sendersRecieverId = company[0].receiverId;
             }
             else
             {
