@@ -566,7 +566,7 @@ namespace ElevPortalenTests {
             Assert.NotNull(result);
             Assert.Equal(expectedStudent.FirstName, result.FirstName);
             Assert.Equal(expectedStudent.LastName, result.LastName);
-            // Add assertions for other properties as needed
+
         }
         #endregion
 
@@ -575,7 +575,7 @@ namespace ElevPortalenTests {
         public async Task GetStudentById_ShouldThrowExceptionForInvalidId() {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
-            var studentId = 0; // Assuming this ID does not exist in the database
+            var studentId = 0; 
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
