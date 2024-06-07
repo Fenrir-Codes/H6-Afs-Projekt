@@ -23,21 +23,5 @@ namespace ElevPortalen.Helpers {
 
 
 
-        //delete this later
-        public async Task CreateUserRoles2Depricated(string user, string role, IServiceProvider _serviceProvider) {
-
-            var roleManager = _serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = _serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-            IdentityResult roleResult;
-            var userRoleCheck = await roleManager.RoleExistsAsync(role);
-            if (!userRoleCheck)
-                roleResult = await roleManager.CreateAsync(new IdentityRole(role));
-
-            IdentityUser identityUser = await userManager.FindByEmailAsync(user);
-            await userManager.AddToRoleAsync(identityUser, role);
-
-        }
-
     }
 }
