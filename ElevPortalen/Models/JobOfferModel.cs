@@ -8,8 +8,8 @@ namespace ElevPortalen.Models
         [Key]
         public int JobOfferId { get; set; }
         public int CompanyId { get; set; }
-        public int? senderId { get; set; }
-        public int? receiverId { get; set; }
+        public int senderId { get; set; }
+        public int receiverId { get; set; }
         [Column(TypeName = "nvarchar(100)")]
         public string? CompanyName { get; set; }
         [Column(TypeName = "nvarchar(200)")]
