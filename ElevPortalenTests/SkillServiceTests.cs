@@ -381,7 +381,6 @@ namespace ElevPortalenTests {
             Assert.Equal(updatedSkills.CSharp, updatedSkillsFromDb.CSharp);
             Assert.Equal(updatedSkills.Java, updatedSkillsFromDb.Java);
             Assert.Equal(updatedSkills.DotNet, updatedSkillsFromDb.DotNet);
-            // Add assertions to check other skills if needed
         }
         #endregion
 
