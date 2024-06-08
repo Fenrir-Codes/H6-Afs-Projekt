@@ -8,7 +8,8 @@ namespace ElevPortalen.Models
         [Key]
         public int MessageId { get; set; } // Primary key
         public int ReceiverId { get; set; } // ID of the Student or company receiving the message
-        public int SendererId { get; set; } // ID of the Student or company sending the message
+        public int SenderId { get; set; } // ID of the Student or company sending the message
+        public int theSendersReceiverId { get; set; } // the id used for answare the message
         [Column(TypeName = "nvarchar(100)")]
         public string? SenderName { get; set; } // Name of the Sender
         [Column(TypeName = "nvarchar(200)")]
