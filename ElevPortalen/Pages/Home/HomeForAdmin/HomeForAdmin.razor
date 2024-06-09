@@ -1,14 +1,315 @@
-﻿<!-- Lavet af Jozsef -->
-<div class="container-fluid d-flex flex-column align-items-center justify-content-center position-relative" style="min-height: 35vh;">
-    <div class="bg-image-container text-center position-absolute top-50 start-50 translate-middle-x" style="z-index: 1;">
-        <img src="/images/Logo_ElevPortalen.png" class="bg-image" style="max-width: 75%; height: auto; opacity: 0.1;">
-    </div>
+﻿@page "/adminhome"
+@using ElevPortalen.Areas.Identity.Pages.Account.Manage
+@using ElevPortalen.Pages.DialogModal
+@using ElevPortalen.Services;
+@using ElevPortalen.Data;
+@using ElevPortalen.Models;
+@using ElevPortalen.Pages.AlertBox
+@using System.Security.Cryptography;
+@using System.Globalization
 
-    <div class="text-container mb-5" style="text-align: center; z-index: 2;">
-        <h3 class="w-100"><span class="badge bg-secondary m-5">Velkommen Admin</span></h3>
-    </div>
-</div>
+@inject ElevPortalenDataDbContext _context
+@inject StudentService _studentService
+@inject CompanyService _companyService
+@inject AdminService _adminService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IConfiguration Configuration
+@inject NavigationManager NavManager
+
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        @if (!isLoaded) {
+            <div class="container-fluid text-center">
+                <!-- Row with skeleton cards -->
+                <div class="row pt-2">
+                    @for (int i = 0; i < 2; i++) {
+                        <div class="col-12 mb-2">
+                            <!-- Skeleton for each card -->
+                            <div class="skeleton-card">
+                                <div class="card-body">
+                                    <div class="skeleton-text"></div>
+                                    <p class="card-text">
+                                        <div class="skeleton-text"></div>
+                                    </p>
+                                    <p class="card-text">
+                                        <div class="skeleton-text"></div>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        } else {
+            <!-- Container -->
+            <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="min-height: 35vh;">
+                <div class="bg-image-container text-center" style="z-index: 1;">
+                    <img src="/images/Logo_ElevPortalen.png" class="bg-image" style="max-width: 75%; max-height: 150px; height: auto; opacity: 0.1;">
+                </div>
+
+                <div class="text-container mb-5" style="text-align: center; z-index: 2;">
+                    <h3 class="w-100"><span class="badge bg-secondary m-5">Velkommen Admin</span></h3>
+                </div>
+            </div>
+
+            <div class="container-fluid text-center">
+                <!-- Row with 4 cards -->
+                <div class="row pt-2">
+
+                    <!-- Admin creation card -->
+                    <div class="col-12 mb-2">
+                        <div class="card bg-dark bg-gradient text-white h-100">
+                            <div class="card-body">
+                                <div class="me-3">
+                                    <div class="text-white-75 small">
+                                        Opret ny Administrator
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="inputEmail" placeholder="Email" @bind="email" />
+                                    <label for="inputEmail" class="text-black">Email</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="inputPassword" placeholder="Password" @bind="password" />
+                                    <label for="inputPassword" class="text-black">Password</label>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between small" @onclick="CreateAdmin" style="cursor:pointer">
+                                <div>Opret</div>
+                                <div><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registration card -->
+                    <div class="col-12 mb-2">
+                        <div class="card bg-dark bg-gradient text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="me-3">
+                                        <div class="text-white-75 small">
+                                            Se Alle Registreringer
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-clock fa-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex align-items-center justify-content-between small" style="cursor:pointer" @onclick="GetRegistration">
+                                <div>Vis</div>
+                                <div><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (isRegistrered) {
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <LineChart @ref="lineChart" Width="800" Class="mb-4" />
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+        }
+    </Authorized>
+
+    <NotAuthorized>
+        <p>You have no rights to administrative homepage!</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AlertBox @ref="_alertBox"></AlertBox>
+
+
 
 @code {
+    AlertBox _alertBox = new AlertBox();
+
+    // List of studentmodel and companymodel
+    private List<StudentModel> _listOfStudents = new List<StudentModel>();
+    private List<CompanyModel> _listOfConpanies = new List<CompanyModel>();
+
+
+   
+    //Count of the registered profiles (we don't need this but it sets loading level right now)
+    int _studentCount = 0;
+    int _companyCount = 0;
+
+    private bool isStudent = false;
+    private bool isCompany = false;
+    private bool isLoaded = false;
+    private bool isRegistrered = false;
+
+    private string email;
+    private string password;
+
+    // Chart
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+    #region initialize
+    protected override async Task OnInitializedAsync() {
+        isLoaded = false;
+        await GetCount();
+
+    }
+    #endregion
+
+
+    #region GetCount
+    public async Task GetCount() {
+        _studentCount = await _studentService.GetStudentCountAsync();
+        _companyCount = await _companyService.GetCompaniesCountAsync();
+        isLoaded = true;
+    }
+    #endregion
+
+    #region Create new admins
+    private async Task CreateAdmin() {
+        if (string.IsNullOrWhiteSpace(email)) {
+            _alertBox.SetMessage(true, "Email cannot be empty.", 10000, warning: true);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(password)) {
+            _alertBox.SetMessage(true, "Password cannot be empty.", 10000, warning: true);
+            return;
+        }
+
+        if (!IsPasswordStrong(password)) {
+            _alertBox.SetMessage(true, "Password is not strong enough. It must contain at least one uppercase letter, one lowercase letter, one digit, one non-alphanumeric character, and be at least 8 characters long.", 10000, warning: true);
+            return;
+        }
+
+        try {
+            await _adminService.CreateAdmin(email, password);
+            // Clear the form fields after creating the admin
+            email = "";
+            password = "";
+            _alertBox.SetMessage(true, "Admin created successfully.", 10000, success: true);
+        } catch (Exception ex) {
+            // Handle exceptions (like email already in use)
+            _alertBox.SetMessage(true, $"An error occurred: {ex.Message}", 10000, warning: true);
+        }
+    }
+
+    // Function to check if a password is strong
+    private bool IsPasswordStrong(string password) {
+        if (password.Length < 8) return false;
+        if (!password.Any(char.IsUpper)) return false;
+        if (!password.Any(char.IsLower)) return false;
+        if (!password.Any(char.IsDigit)) return false;
+        if (!password.Any(char.IsSymbol) && !password.Any(char.IsPunctuation)) return false;
+        return true;
+    }
+    #endregion
+
+
+
+    #region Chart of registration time
+    private async Task GetRegistration() {
+        // Fetch data for students and companies
+        var studentRegistrationData = await _adminService.GetMonthlyRegistrationCountsStudent();
+        var companyRegistrationData = await _adminService.GetMonthlyRegistrationCountsCompany();
+
+        // Parse and sort labels
+        // var cultureInfo = new CultureInfo("hu-HU");
+        var cultureInfo = CultureInfo.CurrentCulture;
+        var labels = studentRegistrationData.Keys
+            .Union(companyRegistrationData.Keys)
+            .Select(dateStr => DateTime.ParseExact(dateStr, "MMMM yyyy", cultureInfo)) // Parse using Danish culture
+            .OrderBy(date => date)
+            .Select(date => date.ToString("MMMM yyyy", cultureInfo)) // Convert back to Danish month-year format
+            .ToList();
+
+        Console.WriteLine("Sorted Labels:");
+        foreach (var label in labels) {
+            Console.WriteLine(label);
+        }
+
+        // Convert the counts from the dictionaries into lists of doubles for the chart
+        var studentData = labels.Select(label => {
+            var key = DateTime.ParseExact(label, "MMMM yyyy", cultureInfo).ToString("MMMM yyyy");
+            return studentRegistrationData.ContainsKey(key) ? (double)studentRegistrationData[key] : 0;
+        })
+            .ToList();
+
+        var companyData = labels.Select(label => {
+            var key = DateTime.ParseExact(label, "MMMM yyyy", cultureInfo).ToString("MMMM yyyy");
+            return companyRegistrationData.ContainsKey(key) ? (double)companyRegistrationData[key] : 0;
+        })
+            .ToList();
+
+        var datasets = new List<IChartDataset>();
+
+        var datasetStudent = new LineChartDataset() {
+                Label = "Lærlinge",
+                Data = studentData,
+                BackgroundColor = new List<string> { "#FF6384" },
+                BorderColor = new List<string> { "#FF6384" },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { "#FF6384" },
+                PointRadius = new List<int> { 3 },
+                PointHoverRadius = new List<int> { 4 },
+                Datalabels = new() { Align = "end", Anchor = "end" }
+            };
+        datasets.Add(datasetStudent);
+
+        var datasetsCompany = new LineChartDataset() {
+                Label = "Firmaer",
+                Data = companyData,
+                BackgroundColor = new List<string> { "#36A2EB" },
+                BorderColor = new List<string> { "#36A2EB" },
+                BorderWidth = new List<double> { 2 },
+                HoverBorderWidth = new List<double> { 4 },
+                PointBackgroundColor = new List<string> { "#36A2EB" },
+                PointRadius = new List<int> { 3 },
+                PointHoverRadius = new List<int> { 4 },
+                Datalabels = new() { Align = "end", Anchor = "end" }
+            };
+        datasets.Add(datasetsCompany);
+
+        chartData = new ChartData {
+                Labels = labels,
+                Datasets = datasets
+            };
+
+        lineChartOptions = new();
+        lineChartOptions.Responsive = true;
+        lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+
+        lineChartOptions.Scales.X!.Title!.Text = "Måneder";
+        lineChartOptions.Scales.X.Title.Display = true;
+
+        lineChartOptions.Scales.Y!.Title!.Text = "Registrerede";
+        lineChartOptions.Scales.Y.Title.Display = true;
+
+
+        lineChartOptions.Plugins.Title!.Text = "Månedlige Registrationer";
+        lineChartOptions.Plugins.Title.Display = true;
+
+        isLoaded = true;
+        isRegistrered = true;
+        isCompany = false;
+        isStudent = false;
+        _listOfStudents.Clear();
+        _listOfConpanies.Clear();
+        await InvokeAsync(StateHasChanged);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (isRegistrered) {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    #endregion
 
 }

@@ -156,18 +156,18 @@ namespace ElevPortalenTests {
             Assert.Contains(userRole, roles); // Assert that assigned role is current role
 
             // Check what HTML is shown here, should say "Velkommen Admin"
-            var expectedHtml = @"    <div class=""container-fluid text-center"" >
-                                      <div class=""container-fluid d-flex flex-column align-items-center justify-content-center position-relative"">
-                                        <div class=""bg-image-container text-center position-absolute top-100 start-50 translate-middle-x"" style=""z-index: 1;"">
-                                          <img src=""/images/Logo_ElevPortalen.png"" class=""bg-image"" style=""max-width: 75%; height: auto; opacity: 0.1;"">
-                                        </div>
-                                        <div class=""text-container mb-5"" style=""text-align: center; z-index: 2;"">
-                                          <h3 class=""w-100"">
-                                            <span class=""badge bg-secondary m-5"">Velkommen Admin</span>
-                                          </h3>
-                                        </div>
-                                      </div>
-                                    </div>";
+            var expectedHtml = @"<div class=""container-fluid text-center"" >
+                                  <div class=""container-fluid d-flex flex-column align-items-center justify-content-center position-relative"" style=""min-height: 35vh;"">
+                                    <div class=""bg-image-container text-center position-absolute top-50 start-50 translate-middle-x"" style=""z-index: 1;"">
+                                      <img src=""/images/Logo_ElevPortalen.png"" class=""bg-image"" style=""max-width: 75%; height: auto; opacity: 0.1;"">
+                                    </div>
+                                    <div class=""text-container mb-5"" style=""text-align: center; z-index: 2;"">
+                                      <h3 class=""w-100"">
+                                        <span class=""badge bg-secondary m-5"">Velkommen Admin</span>
+                                      </h3>
+                                    </div>
+                                  </div>
+                                </div>";
 
             index.MarkupMatches(expectedHtml);
 
@@ -242,24 +242,25 @@ namespace ElevPortalenTests {
             Assert.Contains(userRole, roles); // Assert that assigned role is current role
 
             // Check what HTML is shown here, should contain information about the students
-            var expectedHtml = @"
-                                    <div class=""container-fluid text-center"" >
-                                      <div class=""row"" >
-                                        <div class=""col-lg-12"" >
-                                          <div class=""d-flex justify-content-center w-100 mb-4"" >
-                                            <div class=""input-group mb-3"" style=""max-width:600px;"">
-                                              <input type=""text"" class=""form-control"" placeholder=""Search...""  >
-                                            </div>
-                                          </div>
+            var expectedHtml = @"<div class=""container-fluid text-center"" >
+                                    <div class=""row"" >
+                                    <div class=""col-lg-12"" >
+                                        <div class=""d-flex justify-content-center w-100 mb-4"" >
+                                        <div class=""input-group mb-3"" style=""max-width:600px;"">
+                                            <input type=""text"" class=""form-control"" placeholder=""Search...""  >
                                         </div>
-                                      </div>
-                                      <div class=""container fixed-bottom"" style=""max-width:600px;"">
-                                        <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"">
-                                          <i class=""fa-solid fa-circle-info fa-xl me-3""></i>
-                                          <span class=""fs-5"">Ingen studenter er registreret endnu.</span>
                                         </div>
-                                      </div>
-                                    </div>";
+                                    </div>
+                                    </div>
+                                    <div class=""container fixed-bottom d-flex justify-content-center"" >
+                                    <div class=""alert-container"" >
+                                        <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"" >
+                                        <i class=""fa-solid fa-circle-info fa-xl me-3"" ></i>
+                                        <span class=""fs-5 typewriter"" >Ingen studenter er registreret endnu.</span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>";
 
             index.MarkupMatches(expectedHtml);
         }
@@ -340,10 +341,12 @@ namespace ElevPortalenTests {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class=""container fixed-bottom"" style=""max-width:600px;"">
-                                    <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"">
-                                      <i class=""fa-solid fa-circle-info fa-xl me-3""></i>
-                                      <span class=""fs-5"">Ingen virksomhed er registreret endnu.</span>
+                                  <div class=""container fixed-bottom d-flex justify-content-center"" >
+                                    <div class=""alert-container"" >
+                                      <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"" >
+                                        <i class=""fa-solid fa-circle-info fa-xl me-3"" ></i>
+                                        <span class=""fs-5 typewriter"" >Ingen virksomhed er registreret endnu.</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>";
