@@ -127,19 +127,34 @@ namespace ElevPortalen.Services
         #endregion
 
         #region Count Unread Messages
-        public async Task<int> GetUnredMessageCount(int Id)
+        public async Task<(bool, int)> GetUnreadMessageCount(int Id)
         {
             try
             {
-                int unreadMessageCount = await _context.Messages.Where(m => m.ReceiverId == Id && !m.IsRead).CountAsync();
+                // Count the unread messages
+                int unreadMessageCount = await _context.Messages
+                    .Where(m => m.ReceiverId == Id && !m.IsRead)
+                    .CountAsync();
 
-                return unreadMessageCount;
+                // If there are unread messages, return that count
+                if (unreadMessageCount > 0)
+                {
+                    return (true, unreadMessageCount);
+                }
+
+                // Otherwise, count and return the total number of messages
+                int totalMessageCount = await _context.Messages
+                    .Where(m => m.ReceiverId == Id)
+                    .CountAsync();
+
+                return (false, totalMessageCount);
             }
             catch (Exception)
             {
-                return 0;
+                return (false, 0);
             }
         }
+
         #endregion
     }
 

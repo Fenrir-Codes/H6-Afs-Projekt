@@ -276,7 +276,7 @@ namespace ElevPortalenTests {
 
         #region Create Skills test2 - CreateSkills should overwrite existing skills for a student
         [Fact]
-        public async Task CreateSkills_ShouldProbablyNotUpdateExistingSkills_WhenStudentHasSkills() {
+        public async Task CreateSkills_ShouldNotUpdateExistingSkills_WhenStudentHasSkills() {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var studentId = 1;
@@ -381,7 +381,6 @@ namespace ElevPortalenTests {
             Assert.Equal(updatedSkills.CSharp, updatedSkillsFromDb.CSharp);
             Assert.Equal(updatedSkills.Java, updatedSkillsFromDb.Java);
             Assert.Equal(updatedSkills.DotNet, updatedSkillsFromDb.DotNet);
-            // Add assertions to check other skills if needed
         }
         #endregion
 

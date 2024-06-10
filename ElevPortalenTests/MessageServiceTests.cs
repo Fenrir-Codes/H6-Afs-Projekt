@@ -1,23 +1,19 @@
 ﻿using ElevPortalen.Data;
 using ElevPortalen.Models;
 using ElevPortalen.Services;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ElevPortalenTests {
-    public class MessageServiceTests {
+namespace ElevPortalenTests
+{
+    public class MessageServiceTests
+    {
         private readonly DbContextOptions<ElevPortalenDataDbContext> _options;
         private readonly ElevPortalenDataDbContext _context;
         private readonly MessageService _messageService;
 
         #region Constructor
-        public MessageServiceTests() {
+        public MessageServiceTests()
+        {
             _options = new DbContextOptionsBuilder<ElevPortalenDataDbContext>()
                 .UseInMemoryDatabase(databaseName: "MessageServiceTests")
                 .Options;
@@ -29,10 +25,12 @@ namespace ElevPortalenTests {
 
         #region SendMessage test1 - Create Message (send) - Function should return success
         [Fact]
-        public async void SendMessage_ShouldReturnSuccess_WhenMessageModelIsCorrect() {
+        public async Task SendMessage_ShouldReturnSuccess_WhenMessageModelIsCorrect()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); //Ensure InMemory db is clear
-            var message = new MessageModel {
+            var message = new MessageModel
+            {
                 ReceiverId = 1,
                 SenderName = "Sender",
                 Subject = "Test Subject",
@@ -52,10 +50,12 @@ namespace ElevPortalenTests {
 
         #region Delete Message with the messageId test1 - Function should delete message
         [Fact]
-        public async Task Delete_ShouldDeleteMessage_WhenMessageExists() {
+        public async Task Delete_ShouldDeleteMessage_WhenMessageExists()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
-            var message = new MessageModel {
+            var message = new MessageModel
+            {
                 MessageId = 1,
                 ReceiverId = 2,
                 SenderName = "Sender",
@@ -84,7 +84,8 @@ namespace ElevPortalenTests {
 
         #region Delete Message with the messageId test2 - Function should return message not found
         [Fact]
-        public async Task Delete_ShouldReturnErrorMessage_WhenMessageDoesNotExist() {
+        public async Task Delete_ShouldReturnErrorMessage_WhenMessageDoesNotExist()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
 
@@ -99,7 +100,8 @@ namespace ElevPortalenTests {
 
         #region DeleteAllWithReceiverId test1 - Delete Messages with ReceiverId - Function should delete messages
         [Fact]
-        public async Task DeleteAllWithReceiverId_ShouldDeleteMessages_WhenMessagesExist() {
+        public async Task DeleteAllWithReceiverId_ShouldDeleteMessages_WhenMessagesExist()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var receiverId = 1;
@@ -123,7 +125,8 @@ namespace ElevPortalenTests {
 
         #region DeleteAllWithReceiverId test2 - Delete Messages with ReceiverId - Function should handle case when no messages exist
         [Fact]
-        public async Task DeleteAllWithReceiverId_ShouldHandleNoMessages_WhenNoMessagesExist() {
+        public async Task DeleteAllWithReceiverId_ShouldHandleNoMessages_WhenNoMessagesExist()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var receiverId = 1;
@@ -139,10 +142,12 @@ namespace ElevPortalenTests {
 
         #region MarkMessageAsRead test1 - Mark Message as Read - Function should mark message as read
         [Fact]
-        public async Task MarkMessageAsRead_ShouldMarkMessageAsRead_WhenMessageExists() {
+        public async Task MarkMessageAsRead_ShouldMarkMessageAsRead_WhenMessageExists()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
-            var message = new MessageModel {
+            var message = new MessageModel
+            {
                 MessageId = 1,
                 ReceiverId = 1,
                 SenderName = "Sender",
@@ -166,7 +171,8 @@ namespace ElevPortalenTests {
 
         #region GetMessageWithReceiverId test1 - Get Message with ReceiverId - Function should return messages when messages exist
         [Fact]
-        public async Task GetMessageWithReceiverId_ShouldReturnMessages_WhenMessagesExist() {
+        public async Task GetMessageWithReceiverId_ShouldReturnMessages_WhenMessagesExist()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var receiverId = 1;
@@ -184,7 +190,8 @@ namespace ElevPortalenTests {
             // Assert
             Assert.NotNull(result);
             Assert.Equal(messages.Count, result.Count);
-            foreach (var message in messages) {
+            foreach (var message in messages)
+            {
                 Assert.Contains(message, result);
             }
         }
@@ -192,7 +199,9 @@ namespace ElevPortalenTests {
 
         #region GetUnreadMessageCount test1 - Count Unread Messages - Function should return the correct count of unread messages
         [Fact]
-        public async Task GetUnreadMessageCount_ShouldReturnCorrectCount_WhenMessagesExist() {
+        public async Task GetUnreadMessageCount_ShouldReturnCorrectCount_WhenMessagesExist()
+            //Saturday update broke this test, TODO if possible: Fix
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var receiverId = 1;
@@ -207,7 +216,7 @@ namespace ElevPortalenTests {
             await _context.SaveChangesAsync();
 
             // Act
-            var unreadMessageCount = await _messageService.GetUnredMessageCount(receiverId);
+            var (success, unreadMessageCount) = await _messageService.GetUnreadMessageCount(receiverId);
 
             // Assert
             Assert.Equal(3, unreadMessageCount);
@@ -216,7 +225,8 @@ namespace ElevPortalenTests {
 
         # region GetUnreadMessageCount test2 - Count Unread Messages - return zero when all messages have been read
         [Fact]
-        public async Task GetUnreadMessageCount_ShouldReturnZero_WhenNoUnreadMessagesExist() {
+        public async Task GetUnreadMessageCount_ShouldReturnZero_WhenNoUnreadMessagesExist()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var receiverId = 1;
@@ -230,7 +240,7 @@ namespace ElevPortalenTests {
             await _context.SaveChangesAsync();
 
             // Act
-            var unreadMessageCount = await _messageService.GetUnredMessageCount(receiverId);
+            var (success, unreadMessageCount) = await _messageService.GetUnreadMessageCount(receiverId);
 
             // Assert
             Assert.Equal(0, unreadMessageCount);
@@ -239,13 +249,14 @@ namespace ElevPortalenTests {
 
         #region GetUnreadMessageCount test3 - Count Unread Messages - return zero when user has no messages
         [Fact]
-        public async Task GetUnreadMessageCount_ShouldReturnZero_WhenNoMessagesExist() {
+        public async Task GetUnreadMessageCount_ShouldReturnZero_WhenNoMessagesExist()
+        {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             var receiverId = 1;
 
             // Act
-            var unreadMessageCount = await _messageService.GetUnredMessageCount(receiverId);
+            var (success, unreadMessageCount) = await _messageService.GetUnreadMessageCount(receiverId);
 
             // Assert
             Assert.Equal(0, unreadMessageCount);

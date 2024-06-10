@@ -458,7 +458,7 @@
 
         // Parse and sort labels
         // var cultureInfo = new CultureInfo("hu-HU");
-        var cultureInfo = new CultureInfo("da-DK");
+        var cultureInfo = CultureInfo.CurrentCulture;
         var labels = studentRegistrationData.Keys
             .Union(companyRegistrationData.Keys)
             .Select(dateStr => DateTime.ParseExact(dateStr, "MMMM yyyy", cultureInfo)) // Parse using Danish culture

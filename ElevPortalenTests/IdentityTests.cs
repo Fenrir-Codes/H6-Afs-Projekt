@@ -84,10 +84,8 @@ namespace ElevPortalenTests {
         public async Task CheckNavigationalLoginNameMatch() {
 
             // Arrange
-            //await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             using var context = new TestContext(); // Make a disposable sandbox of the project that can be discarded afterwards
             context.Services.AddSingleton(new CustomRoleHandler()); //Call on our custom role assignment class to handle Authorization and roles
-
             context.Services.AddScoped<AuthenticationStateProvider,
                 RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>(); // Add identity service to validation authorization
 
@@ -156,22 +154,21 @@ namespace ElevPortalenTests {
             Assert.Contains(userRole, roles); // Assert that assigned role is current role
 
             // Check what HTML is shown here, should say "Velkommen Admin"
-            var expectedHtml = @"    <div class=""container-fluid text-center"" >
-                                      <div class=""container-fluid d-flex flex-column align-items-center justify-content-center position-relative"">
-                                        <div class=""bg-image-container text-center position-absolute top-100 start-50 translate-middle-x"" style=""z-index: 1;"">
-                                          <img src=""/images/Logo_ElevPortalen.png"" class=""bg-image"" style=""max-width: 75%; height: auto; opacity: 0.1;"">
-                                        </div>
-                                        <div class=""text-container mb-5"" style=""text-align: center; z-index: 2;"">
-                                          <h3 class=""w-100"">
-                                            <span class=""badge bg-secondary m-5"">Velkommen Admin</span>
-                                          </h3>
-                                        </div>
-                                      </div>
-                                    </div>";
+            var expectedHtml = @"<div class=""container-fluid text-center"" >
+                                  <div class=""container-fluid d-flex flex-column align-items-center justify-content-center position-relative"" style=""min-height: 35vh;"">
+                                    <div class=""bg-image-container text-center position-absolute top-50 start-50 translate-middle-x"" style=""z-index: 1;"">
+                                      <img src=""/images/Logo_ElevPortalen.png"" class=""bg-image"" style=""max-width: 75%; height: auto; opacity: 0.1;"">
+                                    </div>
+                                    <div class=""text-container mb-5"" style=""text-align: center; z-index: 2;"">
+                                      <h3 class=""w-100"">
+                                        <span class=""badge bg-secondary m-5"">Velkommen Admin</span>
+                                      </h3>
+                                    </div>
+                                  </div>
+                                </div>";
 
             index.MarkupMatches(expectedHtml);
-
-            //Assert.True(user.);
+            
         }
         #endregion
 
@@ -184,14 +181,12 @@ namespace ElevPortalenTests {
             // Arrange
             using var context = new TestContext(); // Create a disposable sandbox of the project that can be discarded afterward
 
-            // Configure identity services
+            // Configure Identity services
             context.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase("ApplicationDb"));
-
             // Configure ElevPortalenDataDbContext
             context.Services.AddDbContext<ElevPortalenDataDbContext>(options =>
                 options.UseInMemoryDatabase("ElevPortalenDataDb"));
-
             // Configure DataRecoveryDbContext
             context.Services.AddDbContext<DataRecoveryDbContext>(options =>
                 options.UseInMemoryDatabase("DataRecoveryDb"));
@@ -213,53 +208,49 @@ namespace ElevPortalenTests {
                 ));
             context.Services.AddScoped<SkillService>();
             context.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-
             var serviceProvider = context.Services.BuildServiceProvider();
             var customRoleHandler = serviceProvider.GetRequiredService<CustomRoleHandler>();
 
             // Create the necessary roles and assign them to the user
             var userEmail = "TestCompany@TestCompany.dk";
             var userRole = "Company";
-
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var user = new IdentityUser { UserName = userEmail, Email = userEmail };
             await userManager.CreateAsync(user, "123.Passw0rd");
 
-            await customRoleHandler.CreateUserRoles(userEmail, userRole, serviceProvider);
-
+            await customRoleHandler.CreateUserRoles(userEmail, userRole, serviceProvider); // Create the role in Indentity
             var authorizationContext = context.AddTestAuthorization(); // Create a new context using the sandbox and the built-in test authorization method
             authorizationContext.SetAuthorized(userEmail);    // Create a new authorized user
-
             // Set the role for the authorized user
             authorizationContext.SetRoles(userRole);
 
             // Act
             var index = context.RenderComponent<ElevPortalen.Pages.Index>(); // Render the index display - this display leads to a variety of home pages based on role
-
             var roles = await userManager.GetRolesAsync(user); // Get role of user
 
             // Assert
             Assert.Contains(userRole, roles); // Assert that assigned role is current role
 
             // Check what HTML is shown here, should contain information about the students
-            var expectedHtml = @"
-                                    <div class=""container-fluid text-center"" >
-                                      <div class=""row"" >
-                                        <div class=""col-lg-12"" >
-                                          <div class=""d-flex justify-content-center w-100 mb-4"" >
-                                            <div class=""input-group mb-3"" style=""max-width:600px;"">
-                                              <input type=""text"" class=""form-control"" placeholder=""Search...""  >
-                                            </div>
-                                          </div>
+            var expectedHtml = @"<div class=""container-fluid text-center"" >
+                                    <div class=""row"" >
+                                    <div class=""col-lg-12"" >
+                                        <div class=""d-flex justify-content-center w-100 mb-4"" >
+                                        <div class=""input-group mb-3"" style=""max-width:600px;"">
+                                            <input type=""text"" class=""form-control"" placeholder=""Search...""  >
                                         </div>
-                                      </div>
-                                      <div class=""container fixed-bottom"" style=""max-width:600px;"">
-                                        <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"">
-                                          <i class=""fa-solid fa-circle-info fa-xl me-3""></i>
-                                          <span class=""fs-5"">Ingen studenter er registreret endnu.</span>
                                         </div>
-                                      </div>
-                                    </div>";
+                                    </div>
+                                    </div>
+                                    <div class=""container fixed-bottom d-flex justify-content-center"" >
+                                    <div class=""alert-container"" >
+                                        <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"" >
+                                        <i class=""fa-solid fa-circle-info fa-xl me-3"" ></i>
+                                        <span class=""fs-5 typewriter"" >Ingen studenter er registreret endnu.</span>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>";
 
             index.MarkupMatches(expectedHtml);
         }
@@ -340,10 +331,12 @@ namespace ElevPortalenTests {
                                       </div>
                                     </div>
                                   </div>
-                                  <div class=""container fixed-bottom"" style=""max-width:600px;"">
-                                    <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"">
-                                      <i class=""fa-solid fa-circle-info fa-xl me-3""></i>
-                                      <span class=""fs-5"">Ingen virksomhed er registreret endnu.</span>
+                                  <div class=""container fixed-bottom d-flex justify-content-center"" >
+                                    <div class=""alert-container"" >
+                                      <div class=""alert alert-warning d-flex align-items-center justify-content-center shadow"" role=""alert"" >
+                                        <i class=""fa-solid fa-circle-info fa-xl me-3"" ></i>
+                                        <span class=""fs-5 typewriter"" >Ingen virksomhed er registreret endnu.</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>";
