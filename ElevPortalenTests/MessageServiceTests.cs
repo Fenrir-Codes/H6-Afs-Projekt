@@ -200,6 +200,7 @@ namespace ElevPortalenTests
         #region GetUnreadMessageCount test1 - Count Unread Messages - Function should return the correct count of unread messages
         [Fact]
         public async Task GetUnreadMessageCount_ShouldReturnCorrectCount_WhenMessagesExist()
+            //Saturday update broke this test, TODO if possible: Fix
         {
             // Arrange
             await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear

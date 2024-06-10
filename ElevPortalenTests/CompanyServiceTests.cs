@@ -79,7 +79,7 @@ namespace ElevPortalenTests {
             Assert.True(success); //check if company profile creation was successful
             Assert.Equal("Company Profile Created.", message); //check if message is right 
             Assert.NotNull(addedCompany); //assert that control variable is not null
-            Assert.Equal("TestCompany", result[0].CompanyName); //Assert that data can be found in our mocked companyservice as well
+            Assert.Equal("TestCompany", result[0].CompanyName); //Assert that data can be found in companyservice as well
         }
         #endregion
 
@@ -479,7 +479,7 @@ namespace ElevPortalenTests {
 
             Assert.True(isSuccess); // Check if the update was successful
             Assert.Equal("Updated successfully", resultMessage); // Assert the result message
-            Assert.Equal("UpdatedTestCompany", checkResult[0].CompanyName); //Assert that data can be found in our mocked companyservice as well
+            Assert.Equal("UpdatedTestCompany", checkResult[0].CompanyName); //Assert that data can be found in companyservice as well
 
         }
         #endregion

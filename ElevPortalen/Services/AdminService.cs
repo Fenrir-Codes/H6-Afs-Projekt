@@ -76,8 +76,7 @@ namespace ElevPortalen.Services
 
         #endregion
 
-        #region Create Admin
-        // CreateAdmin function to create a new admin user
+        #region Create Admin function
         public async Task<(bool success, string message)> CreateAdmin(string email, string password) {
             var adminUser = new IdentityUser { UserName = email, Email = email };
 
@@ -85,8 +84,7 @@ namespace ElevPortalen.Services
             if (result.Succeeded) {
                 await _userManager.AddToRoleAsync(adminUser, "Admin");
                 return (true, "Admin user created.");
-            } else {
-                // Handle creation failure, such as displaying errors
+            } else { // Handle creation failure
                 return (false, "Failed to create admin user.");
             }
         }

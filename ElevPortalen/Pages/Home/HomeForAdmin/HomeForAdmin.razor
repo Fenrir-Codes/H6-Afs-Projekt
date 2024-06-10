@@ -55,9 +55,8 @@
             </div>
 
             <div class="container-fluid text-center">
-                <!-- Row with 4 cards -->
+                <!-- Row with 2 cards -->
                 <div class="row pt-2">
-
                     <!-- Admin creation card -->
                     <div class="col-12 mb-2">
                         <div class="card bg-dark bg-gradient text-white h-100">
@@ -171,34 +170,45 @@
 
     #region Create new admins
     private async Task CreateAdmin() {
-        if (string.IsNullOrWhiteSpace(email)) {
+        if (string.IsNullOrWhiteSpace(email)) { // Check if empty
             _alertBox.SetMessage(true, "Email cannot be empty.", 10000, warning: true);
             return;
-        }
-
-        if (string.IsNullOrWhiteSpace(password)) {
-            _alertBox.SetMessage(true, "Password cannot be empty.", 10000, warning: true);
+        } // Check if empty
+        if (!IsValidEmail(email)) { // apply email check
+            _alertBox.SetMessage(true, "Invalid email format.", 10000, warning: true);
             return;
         }
-
-        if (!IsPasswordStrong(password)) {
+        if (string.IsNullOrWhiteSpace(password)) { // Check if empty
+            _alertBox.SetMessage(true, "Password cannot be empty.", 10000, warning: true);
+            return;
+        } // Check if empty
+        if (!IsPasswordStrong(password)) { // Apply Password check
             _alertBox.SetMessage(true, "Password is not strong enough. It must contain at least one uppercase letter, one lowercase letter, one digit, one non-alphanumeric character, and be at least 8 characters long.", 10000, warning: true);
             return;
         }
 
         try {
             await _adminService.CreateAdmin(email, password);
-            // Clear the form fields after creating the admin
-            email = "";
+            email = ""; // Clear the form fields after creating the admin
             password = "";
             _alertBox.SetMessage(true, "Admin created successfully.", 10000, success: true);
-        } catch (Exception ex) {
-            // Handle exceptions (like email already in use)
+        } catch (Exception ex) { // Handle exceptions (like e-mail already in use)
             _alertBox.SetMessage(true, $"An error occurred: {ex.Message}", 10000, warning: true);
         }
     }
+    #endregion
 
-    // Function to check if a password is strong
+    // Helper method to validate email format
+    private bool IsValidEmail(string email) {
+        try {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        } catch {
+            return false;
+        }
+    }
+
+    // Helper method to validate password strength
     private bool IsPasswordStrong(string password) {
         if (password.Length < 8) return false;
         if (!password.Any(char.IsUpper)) return false;
@@ -207,7 +217,6 @@
         if (!password.Any(char.IsSymbol) && !password.Any(char.IsPunctuation)) return false;
         return true;
     }
-    #endregion
 
 
 
