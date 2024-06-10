@@ -84,10 +84,8 @@ namespace ElevPortalenTests {
         public async Task CheckNavigationalLoginNameMatch() {
 
             // Arrange
-            //await _context.Database.EnsureDeletedAsync(); // Ensure InMemory db is clear
             using var context = new TestContext(); // Make a disposable sandbox of the project that can be discarded afterwards
             context.Services.AddSingleton(new CustomRoleHandler()); //Call on our custom role assignment class to handle Authorization and roles
-
             context.Services.AddScoped<AuthenticationStateProvider,
                 RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>(); // Add identity service to validation authorization
 
@@ -170,8 +168,7 @@ namespace ElevPortalenTests {
                                 </div>";
 
             index.MarkupMatches(expectedHtml);
-
-            //Assert.True(user.);
+            
         }
         #endregion
 
@@ -184,14 +181,12 @@ namespace ElevPortalenTests {
             // Arrange
             using var context = new TestContext(); // Create a disposable sandbox of the project that can be discarded afterward
 
-            // Configure identity services
+            // Configure Identity services
             context.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase("ApplicationDb"));
-
             // Configure ElevPortalenDataDbContext
             context.Services.AddDbContext<ElevPortalenDataDbContext>(options =>
                 options.UseInMemoryDatabase("ElevPortalenDataDb"));
-
             // Configure DataRecoveryDbContext
             context.Services.AddDbContext<DataRecoveryDbContext>(options =>
                 options.UseInMemoryDatabase("DataRecoveryDb"));
@@ -213,29 +208,24 @@ namespace ElevPortalenTests {
                 ));
             context.Services.AddScoped<SkillService>();
             context.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-
             var serviceProvider = context.Services.BuildServiceProvider();
             var customRoleHandler = serviceProvider.GetRequiredService<CustomRoleHandler>();
 
             // Create the necessary roles and assign them to the user
             var userEmail = "TestCompany@TestCompany.dk";
             var userRole = "Company";
-
             var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
             var user = new IdentityUser { UserName = userEmail, Email = userEmail };
             await userManager.CreateAsync(user, "123.Passw0rd");
 
-            await customRoleHandler.CreateUserRoles(userEmail, userRole, serviceProvider);
-
+            await customRoleHandler.CreateUserRoles(userEmail, userRole, serviceProvider); // Create the role in Indentity
             var authorizationContext = context.AddTestAuthorization(); // Create a new context using the sandbox and the built-in test authorization method
             authorizationContext.SetAuthorized(userEmail);    // Create a new authorized user
-
             // Set the role for the authorized user
             authorizationContext.SetRoles(userRole);
 
             // Act
             var index = context.RenderComponent<ElevPortalen.Pages.Index>(); // Render the index display - this display leads to a variety of home pages based on role
-
             var roles = await userManager.GetRolesAsync(user); // Get role of user
 
             // Assert
